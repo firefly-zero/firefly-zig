@@ -9,6 +9,6 @@ pub fn build(b: *std.Build) !void {
     const dep_opts = .{ .target = target, .optimize = optimize };
     _ = dep_opts;
     _ = b.addModule("firefly-zig", .{
-        .root_source_file = b.path("src/main.zig"),
+        .root_source_file = b.path("src/root.zig"),
     });
 }
