@@ -19,7 +19,7 @@ pub const RGB = struct {
     b: u8,
 };
 
-pub const Color = enum {
+pub const Color = enum(i32) {
     none,
     black,
     purple,
@@ -58,8 +58,8 @@ pub fn drawTriangle(a: Point, b: Point, c: Point, s: Style) void {
         b.y,
         c.x,
         c.y,
-        s.fill_color,
-        s.stroke_color,
+        @intFromEnum(s.fill_color),
+        @intFromEnum(s.stroke_color),
         s.stroke_width,
     );
 }

@@ -8,7 +8,7 @@ pub fn build(b: *std.Build) !void {
     const optimize = std.builtin.OptimizeMode.ReleaseSmall;
     const dep_opts = .{ .target = target, .optimize = optimize };
     _ = dep_opts;
-    _ = b.addModule("firefly-zig", .{
+    _ = b.addModule("firefly", .{
         .root_source_file = b.path("src/root.zig"),
     });
 }

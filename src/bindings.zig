@@ -1,4 +1,4 @@
-extern "graphics" fn draw_triangle(
+pub extern "graphics" fn draw_triangle(
     p1x: i32,
     p1y: i32,
     p2x: i32,
