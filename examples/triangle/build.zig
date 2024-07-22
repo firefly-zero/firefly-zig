@@ -7,12 +7,21 @@ pub fn build(b: *std.Build) void {
     };
     const target = b.resolveTargetQuery(target_query);
     const optimize = std.builtin.OptimizeMode.ReleaseSmall;
+    // const exe = b.addSharedLibrary(.{
+    //     .name = "triangle",
+    //     .root_source_file = b.path("src/main.zig"),
+    //     .target = target,
+    //     .optimize = optimize,
+    //     .strip = true,
+    // });
     const exe = b.addExecutable(.{
-        .name = "example",
+        .name = "triangle",
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
+        .strip = true,
     });
+    exe.entry = .disabled;
     const firefly_package = b.dependency("firefly", .{});
     const firefly_module = firefly_package.module("firefly");
     exe.root_module.addImport("firefly", firefly_module);
