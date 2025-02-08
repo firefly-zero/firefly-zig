@@ -50,6 +50,10 @@ pub const LineStyle = struct {
     width: i32,
 };
 
+pub fn clearScreen(c: Color) void {
+    bindings.clear_screen(@intFromEnum(c));
+}
+
 pub fn drawTriangle(a: Point, b: Point, c: Point, s: Style) void {
     bindings.draw_triangle(
         a.x,
