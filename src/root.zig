@@ -46,22 +46,39 @@ pub const RGB = struct {
 };
 
 pub const Color = enum(i32) {
+    /// No color (100% transparency).
     none,
+    /// Black color: #1A1C2C.
     black,
+    /// Purple color: #5D275D.
     purple,
+    /// Red color: #B13E53.
     red,
+    /// Orange color: #EF7D57.
     orange,
+    /// Yellow color: #FFCD75.
     yellow,
+    /// Light green color: #A7F070.
     light_green,
+    /// Green color: #38B764.
     green,
+    /// Dark green color: #257179.
     dark_green,
+    /// Dark blue color: #29366F.
     dark_blue,
+    /// Blue color: #3B5DC9.
     blue,
+    /// Light blue color: #41A6F6.
     light_blue,
+    /// Cyan color: #73EFF7.
     cyan,
+    /// White color: #F4F4F4.
     white,
+    /// Light gray color: #94B0C2.
     light_gray,
+    /// Gray color: #566C86.
     gray,
+    /// Dark gray color: #333C57.
     dark_gray,
 };
 
