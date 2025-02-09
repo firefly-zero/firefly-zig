@@ -54,6 +54,37 @@ pub fn clearScreen(c: Color) void {
     bindings.clear_screen(@intFromEnum(c));
 }
 
+pub fn setColor(i: Color, rgb: RGB) void {
+    bindings.set_color(@intFromEnum(i), rgb.r, rgb.g, rgb.b);
+}
+
+pub fn drawPoint(p: Point, c: Color) void {
+    bindings.draw_point(p.x, p.y, @intFromEnum(c));
+}
+
+pub fn drawLine(a: Point, b: Point, s: LineStyle) void {
+    bindings.draw_line(
+        a.x,
+        a.y,
+        b.x,
+        b.y,
+        @intFromEnum(s.color),
+        s.width,
+    );
+}
+
+pub fn drawRect(p: Point, b: Size, s: Style) void {
+    bindings.draw_rect(
+        p.x,
+        p.y,
+        b.width,
+        b.height,
+        @intFromEnum(s.fill_color),
+        @intFromEnum(s.stroke_color),
+        s.stroke_width,
+    );
+}
+
 pub fn drawTriangle(a: Point, b: Point, c: Point, s: Style) void {
     bindings.draw_triangle(
         a.x,
