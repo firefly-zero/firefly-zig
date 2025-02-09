@@ -119,7 +119,41 @@ pub const Buttons = struct {
     menu: bool,
 };
 
-pub const Peer = u32;
+pub const Peer = u8;
+
+pub const Peers = struct {
+    peers: u32,
+
+    pub fn contains(self: Peers, p: Peer) bool {
+        return (self.peers >> p) & 1 != 0;
+    }
+
+    pub fn len(self: Peers) u32 {
+        return @popCount(self.peers);
+    }
+
+    pub fn iter(self: Peers) PeersIter {
+        return PeersIter{ .peer = 0, .peers = self.peers };
+    }
+};
+
+pub const PeersIter = struct {
+    peer: u8,
+    peers: u32,
+
+    pub fn next(self: *PeersIter) ?Peer {
+        while (self.peers != 0) {
+            const peer = self.peer;
+            const peers = self.peers;
+            self.peer += 1;
+            self.peers >>= 1;
+            if (peers & 1 != 0) {
+                return Peer(peer);
+            }
+        }
+        return null;
+    }
+};
 
 /// Fill the whole frame with the given color.
 pub fn clearScreen(c: Color) void {
@@ -359,12 +393,12 @@ pub fn removeFile(path: String) void {
 /// The `i` index is the value passed into the `handle_menu` callback
 /// when the menu item is selected by the user.
 /// Its value doesn't have to be unique or continious.
-pub fn add_menu_item(i: u8, t: String) void {
+pub fn addMenuItem(i: u8, t: String) void {
     bindings.add_menu_item(i, t.ptr, t.len);
 }
 
 /// Remove a custom menu item with the given index.
-pub fn remove_menu_item(i: u8) void {
+pub fn removeMenuItem(i: u8) void {
     bindings.remove_menu_item(i);
 }
 
@@ -372,31 +406,41 @@ pub fn remove_menu_item(i: u8) void {
 ///
 /// It will be opened before the next update.
 /// The current update and then render will proceed as planned.
-pub fn open_menu() void {
+pub fn openMenu() void {
     bindings.open_menu();
 }
 
 /// Log a debug message.
-pub fn log_debug(t: String) void {
+pub fn logDebug(t: String) void {
     bindings.log_debug(t.ptr, t.len);
 }
 
 /// Log an error message.
-pub fn log_error(t: String) void {
+pub fn logError(t: String) void {
     bindings.log_error(t.ptr, t.len);
 }
 
 /// Set the random seed.
-pub fn set_seed(seed: u32) void {
+pub fn setSeed(seed: u32) void {
     bindings.set_seed(seed);
 }
 
 /// Get a random value.
-pub fn get_random() u32 {
+pub fn getRandom() u32 {
     bindings.get_random();
 }
 
 /// Exit the app after the current update is finished.
 pub fn quit() void {
     bindings.quit();
+}
+
+/// Get the peer corresponding to the local device.
+pub fn getMe() Peer {
+    return bindings.get_me();
+}
+
+/// Get the list of peers online.
+pub fn getPeers() Peers {
+    return Peers{bindings.get_peers()};
 }
