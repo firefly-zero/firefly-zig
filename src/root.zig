@@ -287,7 +287,7 @@ pub fn unsetCanvas() void {
 }
 
 /// Get the current touchpad state.
-pub fn ReadPad(p: Peer) ?Pad {
+pub fn readPad(p: Peer) ?Pad {
     const raw = bindings.read_pad(p);
     if (raw == 0xffff) {
         return null;
@@ -299,7 +299,7 @@ pub fn ReadPad(p: Peer) ?Pad {
 }
 
 /// Get the currently pressed buttons.
-pub fn ReadButtons(p: Peer) Buttons {
+pub fn readButtons(p: Peer) Buttons {
     const raw = bindings.read_buttons(p);
     return Buttons{
         .s = raw & 1 != 0,
@@ -313,25 +313,25 @@ pub fn ReadButtons(p: Peer) Buttons {
 /// Get a file size in the rom or data dir.
 ///
 /// If the file does not exist, 0 is returned.
-pub fn GetFileSize(path: String) u32 {
+pub fn getFileSize(path: String) u32 {
     return bindings.get_file_size(path.ptr, path.len);
 }
 
 /// Read the whole file with the given name into the given buffer.
 ///
 /// If the file size is not known in advance (and so the buffer has to be allocated
-/// dynamically), consider using LoadFileBuf() instead.
-pub fn LoadFile(path: String, buf: []const u8) []u8 {
+/// dynamically), consider using loadFileBuf() instead.
+pub fn loadFile(path: String, buf: []const u8) []u8 {
     const size = bindings.load_file(path.ptr, path.len, buf.ptr, buf.len);
     return buf[0..size];
 }
 
 /// Read the whole file with the given name.
 ///
-/// If you have a pre-allocated buffer of the right size, use LoadFile() instead.
+/// If you have a pre-allocated buffer of the right size, use loadFile() instead.
 ///
 /// null is returned if the file does not exist.
-pub fn LoadFileBuf(path: String, alloc: std.mem.Allocator) ?[]u8 {
+pub fn loadFileBuf(path: String, alloc: std.mem.Allocator) ?[]u8 {
     const size = bindings.get_file_size(path.ptr, path.len);
     if (size == 0) {
         return null;
@@ -352,4 +352,26 @@ pub fn dumpFile(path: String, buf: []const u8) void {
 /// Remove file (if exists) with the given name from the data dir.
 pub fn removeFile(path: String) void {
     bindings.remove_file(path.ptr, path.len);
+}
+
+/// Add a custom item on the app menu.
+///
+/// The `i` index is the value passed into the `handle_menu` callback
+/// when the menu item is selected by the user.
+/// Its value doesn't have to be unique or continious.
+pub fn add_menu_item(i: u8, t: String) void {
+    bindings.add_menu_item(i, t.ptr, t.len);
+}
+
+/// Remove a custom menu item with the given index.
+pub fn remove_menu_item(i: u8) void {
+    bindings.remove_menu_item(i);
+}
+
+/// Open the app menu.
+///
+/// It will be opened before the next update.
+/// The current update and then render will proceed as planned.
+pub fn open_menu() void {
+    bindings.open_menu();
 }
