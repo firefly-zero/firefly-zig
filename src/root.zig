@@ -76,6 +76,18 @@ pub const LineStyle = struct {
     width: i32,
 };
 
+pub const File = []u8;
+pub const Font = File;
+pub const Image = File;
+pub const Canvas = Image;
+pub const String = []u8;
+
+pub const SubImage = struct {
+    point: Point,
+    size: Size,
+    raw: []u8,
+};
+
 /// Fill the whole frame with the given color.
 pub fn clearScreen(c: Color) void {
     bindings.clear_screen(@intFromEnum(c));
@@ -198,53 +210,43 @@ pub fn drawSector(p: Point, d: i32, start: Angle, sweep: Angle, s: Style) void {
 ///
 /// Unlike in the other drawing functions, here [Point] points not to the top-left corner
 /// but to the baseline start position.
-// pub fn drawText(t: str, f: Font, p: Point, c: Color) void {
-//     let text_ptr = t.as_ptr();
-//     let text_len = t.len();
-//     let font_ptr = f.raw.as_ptr();
-//     let font_len = f.raw.len();
-//     bindings.draw_text(
-//             text_ptr ,
-//             text_len ,
-//             font_ptr ,
-//             font_len ,
-//             p.x,
-//             p.y,
-//             @intFromEnum(c),
-//         );
-// }
+pub fn drawText(t: String, f: Font, p: Point, c: Color) void {
+    bindings.draw_text(
+        t.ptr,
+        t.len,
+        f.ptr,
+        f.len,
+        p.x,
+        p.y,
+        @intFromEnum(c),
+    );
+}
 
 /// Render an image using the given colors.
-// pub fn drawImage(i: Image, p: Point) void {
-//     let ptr = i.raw.as_ptr();
-//     let len = i.raw.len();
-//     bindings.draw_image(ptr , len , p.x, p.y);
-// }
+pub fn drawImage(i: Image, p: Point) void {
+    bindings.draw_image(i.ptr, i.len, p.x, p.y);
+}
 
 /// Draw a subregion of an image.
 ///
 /// Most often used to draw a sprite from a sprite atlas.
-// pub fn drawSubImage(i: SubImage, p: Point) void {
-//     let ptr = i.raw.as_ptr();
-//     let len = i.raw.len();
-//     bindings.draw_sub_image(
-//             ptr ,
-//             len ,
-//             p.x,
-//             p.y,
-//             i.point.x,
-//             i.point.y,
-//             i.size.width,
-//             i.size.height,
-//         );
-// }
+pub fn drawSubImage(i: SubImage, p: Point) void {
+    bindings.draw_sub_image(
+        i.raw.ptr,
+        i.raw.len,
+        p.x,
+        p.y,
+        i.point.x,
+        i.point.y,
+        i.size.width,
+        i.size.height,
+    );
+}
 
 /// Set canvas to be used for all subsequent drawing operations.
-// pub fn setCanvas(c: Canvas) void {
-//     let ptr = c.raw.as_ptr();
-//     let len = c.raw.len();
-//     bindings.set_canvas(ptr , len );
-// }
+pub fn setCanvas(c: Canvas) void {
+    bindings.set_canvas(c.ptr, c.len);
+}
 
 /// Unset canvas set by [`set_canvas`]. All subsequent drawing operations will target frame buffer.
 pub fn unsetCanvas() void {
