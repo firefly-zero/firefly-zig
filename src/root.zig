@@ -310,18 +310,27 @@ pub fn ReadButtons(p: Peer) Buttons {
     };
 }
 
+/// Get a file size in the rom or data dir.
+///
+/// If the file does not exist, 0 is returned.
 pub fn GetFileSize(path: String) u32 {
     return bindings.get_file_size(path.ptr, path.len);
 }
 
-pub fn LoadFile(path: String, buf: []const u8) ?[]u8 {
+/// Read the whole file with the given name into the given buffer.
+///
+/// If the file size is not known in advance (and so the buffer has to be allocated
+/// dynamically), consider using LoadFileBuf() instead.
+pub fn LoadFile(path: String, buf: []const u8) []u8 {
     const size = bindings.load_file(path.ptr, path.len, buf.ptr, buf.len);
-    if (size == 0) {
-        return null;
-    }
     return buf[0..size];
 }
 
+/// Read the whole file with the given name.
+///
+/// If you have a pre-allocated buffer of the right size, use LoadFile() instead.
+///
+/// null is returned if the file does not exist.
 pub fn LoadFileBuf(path: String, alloc: std.mem.Allocator) ?[]u8 {
     const size = bindings.get_file_size(path.ptr, path.len);
     if (size == 0) {
@@ -330,4 +339,17 @@ pub fn LoadFileBuf(path: String, alloc: std.mem.Allocator) ?[]u8 {
     const buf = try alloc.alloc(u8, size);
     bindings.load_file(path.ptr, path.len, buf.ptr, buf.len);
     return buf;
+}
+
+/// Write the buffer into the given file in the data dir.
+///
+/// If the file exists, it will be overwritten.
+/// If it doesn't exist, it will be created.
+pub fn dumpFile(path: String, buf: []const u8) void {
+    bindings.dump_file(path.ptr, path.len, buf.ptr, buf.len);
+}
+
+/// Remove file (if exists) with the given name from the data dir.
+pub fn removeFile(path: String) void {
+    bindings.remove_file(path.ptr, path.len);
 }
