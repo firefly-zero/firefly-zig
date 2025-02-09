@@ -105,6 +105,21 @@ pub const SubImage = struct {
     raw: []u8,
 };
 
+pub const Pad = struct {
+    x: i32,
+    y: i32,
+};
+
+pub const Buttons = struct {
+    s: bool,
+    e: bool,
+    w: bool,
+    n: bool,
+    menu: bool,
+};
+
+pub const Peer = u32;
+
 /// Fill the whole frame with the given color.
 pub fn clearScreen(c: Color) void {
     bindings.clear_screen(@intFromEnum(c));
@@ -268,4 +283,28 @@ pub fn setCanvas(c: Canvas) void {
 /// Unset canvas set by [`set_canvas`]. All subsequent drawing operations will target frame buffer.
 pub fn unsetCanvas() void {
     bindings.unset_canvas();
+}
+
+/// Get the current touchpad state.
+pub fn ReadPad(p: Peer) ?Pad {
+    const raw = bindings.read_pad(p);
+    if (raw == 0xffff) {
+        return null;
+    }
+    return Pad{
+        .x = (raw >> 16),
+        .y = raw,
+    };
+}
+
+/// Get the currently pressed buttons.
+pub fn ReadButtons(p: Peer) Buttons {
+    const raw = bindings.read_buttons(p);
+    return Buttons{
+        .s = raw & 1 != 0,
+        .e = (raw >> 1) & 1 != 0,
+        .w = (raw >> 2) & 1 != 0,
+        .n = (raw >> 3) & 1 != 0,
+        .menu = (raw >> 4) & 1 != 0,
+    };
 }
