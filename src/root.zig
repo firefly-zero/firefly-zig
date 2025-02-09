@@ -1,3 +1,4 @@
+const std = @import("std");
 const bindings = @import("./bindings.zig");
 
 pub const width: i32 = 240;
@@ -97,7 +98,7 @@ pub const File = []u8;
 pub const Font = File;
 pub const Image = File;
 pub const Canvas = Image;
-pub const String = []u8;
+pub const String = []const u8;
 
 pub const SubImage = struct {
     point: Point,
@@ -307,4 +308,26 @@ pub fn ReadButtons(p: Peer) Buttons {
         .n = (raw >> 3) & 1 != 0,
         .menu = (raw >> 4) & 1 != 0,
     };
+}
+
+pub fn GetFileSize(path: String) u32 {
+    return bindings.get_file_size(path.ptr, path.len);
+}
+
+pub fn LoadFile(path: String, buf: []const u8) ?[]u8 {
+    const size = bindings.load_file(path.ptr, path.len, buf.ptr, buf.len);
+    if (size == 0) {
+        return null;
+    }
+    return buf[0..size];
+}
+
+pub fn LoadFileBuf(path: String, alloc: std.mem.Allocator) ?[]u8 {
+    const size = bindings.get_file_size(path.ptr, path.len);
+    if (size == 0) {
+        return null;
+    }
+    const buf = try alloc.alloc(u8, size);
+    bindings.load_file(path.ptr, path.len, buf.ptr, buf.len);
+    return buf;
 }
