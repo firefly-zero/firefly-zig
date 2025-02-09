@@ -375,3 +375,28 @@ pub fn remove_menu_item(i: u8) void {
 pub fn open_menu() void {
     bindings.open_menu();
 }
+
+/// Log a debug message.
+pub fn log_debug(t: String) void {
+    bindings.log_debug(t.ptr, t.len);
+}
+
+/// Log an error message.
+pub fn log_error(t: String) void {
+    bindings.log_error(t.ptr, t.len);
+}
+
+/// Set the random seed.
+pub fn set_seed(seed: u32) void {
+    bindings.set_seed(seed);
+}
+
+/// Get a random value.
+pub fn get_random() u32 {
+    bindings.get_random();
+}
+
+/// Exit the app after the current update is finished.
+pub fn quit() void {
+    bindings.quit();
+}
