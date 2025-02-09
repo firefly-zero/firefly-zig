@@ -119,7 +119,23 @@ pub const Buttons = struct {
     menu: bool,
 };
 
-pub const Peer = u8;
+pub const Peer = packed struct(u8) {
+    pub const combined: @This() = @bitCast(@as(u8, 0xFF));
+    peer0: bool = false,
+    peer1: bool = false,
+    peer2: bool = false,
+    peer3: bool = false,
+    peer4: bool = false,
+    peer5: bool = false,
+    peer6: bool = false,
+    peer7: bool = false,
+
+    fn val(this: @This()) u32 {
+        const cast: u8 = @bitCast(this);
+        const widened: u32 = @intCast(cast);
+        return widened;
+    }
+};
 
 pub const Peers = struct {
     peers: u32,
@@ -172,7 +188,7 @@ pub fn drawPoint(p: Point, c: Color) void {
 
 /// Draw a straight line from point a to point b.
 pub fn drawLine(a: Point, b: Point, s: LineStyle) void {
-    bindings.draw_line(a.x, a.y, b.x, b.y, s.color, s.width);
+    bindings.draw_line(a.x, a.y, b.x, b.y, @intFromEnum(s.color), s.width);
 }
 
 /// Draw a rectangle filling the given bounding box.
@@ -279,9 +295,9 @@ pub fn drawSector(p: Point, d: i32, start: Angle, sweep: Angle, s: Style) void {
 /// but to the baseline start position.
 pub fn drawText(t: String, f: Font, p: Point, c: Color) void {
     bindings.draw_text(
-        t.ptr,
+        @intFromPtr(t.ptr),
         t.len,
-        f.ptr,
+        @intFromPtr(f.ptr),
         f.len,
         p.x,
         p.y,
@@ -291,7 +307,7 @@ pub fn drawText(t: String, f: Font, p: Point, c: Color) void {
 
 /// Render an image using the given colors.
 pub fn drawImage(i: Image, p: Point) void {
-    bindings.draw_image(i.ptr, i.len, p.x, p.y);
+    bindings.draw_image(@intFromPtr(i.ptr), i.len, p.x, p.y);
 }
 
 /// Draw a subregion of an image.
@@ -299,7 +315,7 @@ pub fn drawImage(i: Image, p: Point) void {
 /// Most often used to draw a sprite from a sprite atlas.
 pub fn drawSubImage(i: SubImage, p: Point) void {
     bindings.draw_sub_image(
-        i.raw.ptr,
+        @intFromPtr(i.raw.ptr),
         i.raw.len,
         p.x,
         p.y,
@@ -312,7 +328,7 @@ pub fn drawSubImage(i: SubImage, p: Point) void {
 
 /// Set canvas to be used for all subsequent drawing operations.
 pub fn setCanvas(c: Canvas) void {
-    bindings.set_canvas(c.ptr, c.len);
+    bindings.set_canvas(@intFromPtr(c.ptr), c.len);
 }
 
 /// Unset canvas set by [`set_canvas`]. All subsequent drawing operations will target frame buffer.
@@ -322,13 +338,13 @@ pub fn unsetCanvas() void {
 
 /// Get the current touchpad state.
 pub fn readPad(p: Peer) ?Pad {
-    const raw = bindings.read_pad(p);
+    const raw = bindings.read_pad(p.val());
     if (raw == 0xffff) {
         return null;
     }
     return Pad{
-        .x = (raw >> 16),
-        .y = raw,
+        .x = @intCast(@as(i16, @truncate(raw >> 16))),
+        .y = @intCast(@as(i16, @truncate(raw & 0xFFFF))),
     };
 }
 
@@ -348,15 +364,15 @@ pub fn readButtons(p: Peer) Buttons {
 ///
 /// If the file does not exist, 0 is returned.
 pub fn getFileSize(path: String) u32 {
-    return bindings.get_file_size(path.ptr, path.len);
+    return bindings.get_file_size(@intFromPtr(path.ptr), path.len);
 }
 
 /// Read the whole file with the given name into the given buffer.
 ///
 /// If the file size is not known in advance (and so the buffer has to be allocated
 /// dynamically), consider using loadFileBuf() instead.
-pub fn loadFile(path: String, buf: []const u8) []u8 {
-    const size = bindings.load_file(path.ptr, path.len, buf.ptr, buf.len);
+pub fn loadFile(path: String, buf: []u8) []u8 {
+    const size = bindings.load_file(@intFromPtr(path.ptr), path.len, @intFromPtr(buf.ptr), buf.len);
     return buf[0..size];
 }
 
@@ -366,12 +382,12 @@ pub fn loadFile(path: String, buf: []const u8) []u8 {
 ///
 /// null is returned if the file does not exist.
 pub fn loadFileBuf(path: String, alloc: std.mem.Allocator) ?[]u8 {
-    const size = bindings.get_file_size(path.ptr, path.len);
+    const size = bindings.get_file_size(@intFromPtr(path.ptr), path.len);
     if (size == 0) {
         return null;
     }
     const buf = try alloc.alloc(u8, size);
-    bindings.load_file(path.ptr, path.len, buf.ptr, buf.len);
+    bindings.load_file(@intFromPtr(path.ptr), path.len, @intFromPtr(buf.ptr), buf.len);
     return buf;
 }
 
@@ -380,12 +396,12 @@ pub fn loadFileBuf(path: String, alloc: std.mem.Allocator) ?[]u8 {
 /// If the file exists, it will be overwritten.
 /// If it doesn't exist, it will be created.
 pub fn dumpFile(path: String, buf: []const u8) void {
-    bindings.dump_file(path.ptr, path.len, buf.ptr, buf.len);
+    bindings.dump_file(@intFromPtr(path.ptr), path.len, @intFromPtr(buf.ptr), buf.len);
 }
 
 /// Remove file (if exists) with the given name from the data dir.
 pub fn removeFile(path: String) void {
-    bindings.remove_file(path.ptr, path.len);
+    bindings.remove_file(@intFromPtr(path.ptr), path.len);
 }
 
 /// Add a custom item on the app menu.
@@ -394,7 +410,7 @@ pub fn removeFile(path: String) void {
 /// when the menu item is selected by the user.
 /// Its value doesn't have to be unique or continious.
 pub fn addMenuItem(i: u8, t: String) void {
-    bindings.add_menu_item(i, t.ptr, t.len);
+    bindings.add_menu_item(i, @intFromPtr(t.ptr), t.len);
 }
 
 /// Remove a custom menu item with the given index.
@@ -412,12 +428,12 @@ pub fn openMenu() void {
 
 /// Log a debug message.
 pub fn logDebug(t: String) void {
-    bindings.log_debug(t.ptr, t.len);
+    bindings.log_debug(@intFromPtr(t.ptr), t.len);
 }
 
 /// Log an error message.
 pub fn logError(t: String) void {
-    bindings.log_error(t.ptr, t.len);
+    bindings.log_error(@intFromPtr(t.ptr), t.len);
 }
 
 /// Set the random seed.
