@@ -164,6 +164,20 @@ pub const PeersIter = struct {
     }
 };
 
+pub const Badge = u8;
+pub const Board = u8;
+
+pub const Progress = struct {
+    /// How many points the player already has.
+    done: u16,
+    /// How many points the player needs to earn the badge.
+    goal: u16,
+
+    pub fn earned(self: Progress) bool {
+        return self.done >= self.goal;
+    }
+};
+
 /// Fill the whole frame with the given color.
 pub fn clearScreen(c: Color) void {
     bindings.clear_screen(@intFromEnum(c));
@@ -464,4 +478,41 @@ pub fn loadStash(p: Peer, s: Stash) ?Stash {
         return null;
     }
     return s[0..size];
+}
+
+/// Get the progress of earning the badge.
+pub fn getProgress(p: Peer, b: Badge) Progress {
+    return addProgress(p, b, 0);
+}
+
+/// Add the given value to the progress for the badge.
+///
+/// May be negative if you want to decrease the progress.
+/// If zero, does not change the progress.
+///
+/// If the Peer is [`Peer.combined`], the progress is added to every peer
+/// and the returned value is the lowest progress.
+pub fn addProgress(p: Peer, b: Badge, val: i32) Progress {
+    const raw = bindings.add_progress(@intFromEnum(p), b, val);
+    return Progress{
+        .done = @intCast(@as(i16, @truncate(raw >> 16))),
+        .goal = @intCast(@as(i16, @truncate(raw & 0xFFFF))),
+    };
+}
+
+/// Get the personal best of the player.
+pub fn getScore(p: Peer, b: Board) i16 {
+    return addScore(p, b, 0);
+}
+
+/// Add the given score to the board.
+///
+/// May be negative if you want the lower scores
+/// to rank higher. Zero value is not added to the board.
+///
+/// If the Peer is [`Peer.combined`], the score is added for every peer
+/// and the returned value is the lowest of their best scores.
+pub fn addScore(p: Peer, b: Board, val: i16) i16 {
+    const raw = bindings.add_score(@intFromEnum(p), b, val);
+    return @intCast(@as(i16, @truncate(raw & 0xFFFF)));
 }

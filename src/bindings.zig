@@ -134,33 +134,35 @@ pub const sudo = struct {
     pub extern "sudo" fn get_file_size(path_ptr: u32, path_len: u32) u32;
 };
 
-// generators
-pub extern "audio" fn add_sine(parent_id: u32, freq: f32, phase: f32) u32;
-pub extern "audio" fn add_square(parent_id: u32, freq: f32, phase: f32) u32;
-pub extern "audio" fn add_sawtooth(parent_id: u32, freq: f32, phase: f32) u32;
-pub extern "audio" fn add_triangle(parent_id: u32, freq: f32, phase: f32) u32;
-pub extern "audio" fn add_noise(parent_id: u32, seed: i32) u32;
-pub extern "audio" fn add_empty(parent_id: u32) u32;
-pub extern "audio" fn add_zero(parent_id: u32) u32;
-pub extern "audio" fn add_file(parent: u32, ptr: u32, len: u32) u32;
+pub const audio = struct {
+    // generators
+    pub extern "audio" fn add_sine(parent_id: u32, freq: f32, phase: f32) u32;
+    pub extern "audio" fn add_square(parent_id: u32, freq: f32, phase: f32) u32;
+    pub extern "audio" fn add_sawtooth(parent_id: u32, freq: f32, phase: f32) u32;
+    pub extern "audio" fn add_triangle(parent_id: u32, freq: f32, phase: f32) u32;
+    pub extern "audio" fn add_noise(parent_id: u32, seed: i32) u32;
+    pub extern "audio" fn add_empty(parent_id: u32) u32;
+    pub extern "audio" fn add_zero(parent_id: u32) u32;
+    pub extern "audio" fn add_file(parent: u32, ptr: u32, len: u32) u32;
 
-// nodes
-pub extern "audio" fn add_mix(parent_id: u32) u32;
-pub extern "audio" fn add_all_for_one(parent_id: u32) u32;
-pub extern "audio" fn add_gain(parent_id: u32, lvl: f32) u32;
-pub extern "audio" fn add_loop(parent_id: u32) u32;
-pub extern "audio" fn add_concat(parent_id: u32) u32;
-pub extern "audio" fn add_pan(parent_id: u32, lvl: f32) u32;
-pub extern "audio" fn add_mute(parent_id: u32) u32;
-pub extern "audio" fn add_pause(parent_id: u32) u32;
-pub extern "audio" fn add_track_position(parent_id: u32) u32;
-pub extern "audio" fn add_low_pass(parent_id: u32, freq: f32, q: f32) u32;
-pub extern "audio" fn add_high_pass(parent_id: u32, freq: f32, q: f32) u32;
-pub extern "audio" fn add_take_left(parent_id: u32) u32;
-pub extern "audio" fn add_take_right(parent_id: u32) u32;
-pub extern "audio" fn add_swap(parent_id: u32) u32;
-pub extern "audio" fn add_clip(parent_id: u32, low: f32, high: f32) u32;
+    // nodes
+    pub extern "audio" fn add_mix(parent_id: u32) u32;
+    pub extern "audio" fn add_all_for_one(parent_id: u32) u32;
+    pub extern "audio" fn add_gain(parent_id: u32, lvl: f32) u32;
+    pub extern "audio" fn add_loop(parent_id: u32) u32;
+    pub extern "audio" fn add_concat(parent_id: u32) u32;
+    pub extern "audio" fn add_pan(parent_id: u32, lvl: f32) u32;
+    pub extern "audio" fn add_mute(parent_id: u32) u32;
+    pub extern "audio" fn add_pause(parent_id: u32) u32;
+    pub extern "audio" fn add_track_position(parent_id: u32) u32;
+    pub extern "audio" fn add_low_pass(parent_id: u32, freq: f32, q: f32) u32;
+    pub extern "audio" fn add_high_pass(parent_id: u32, freq: f32, q: f32) u32;
+    pub extern "audio" fn add_take_left(parent_id: u32) u32;
+    pub extern "audio" fn add_take_right(parent_id: u32) u32;
+    pub extern "audio" fn add_swap(parent_id: u32) u32;
+    pub extern "audio" fn add_clip(parent_id: u32, low: f32, high: f32) u32;
 
-pub extern "audio" fn reset(node_id: u32) void;
-pub extern "audio" fn reset_all(node_id: u32) void;
-pub extern "audio" fn clear(node_id: u32) void;
+    pub extern "audio" fn reset(node_id: u32) void;
+    pub extern "audio" fn reset_all(node_id: u32) void;
+    pub extern "audio" fn clear(node_id: u32) void;
+};
