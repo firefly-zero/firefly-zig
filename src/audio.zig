@@ -6,7 +6,7 @@ pub const Time = u32;
 fn Node(comptime T: type) type {
     return struct {
         id: u32,
-        usingnamespace T;
+        pub usingnamespace T;
 
         /// Add sine wave oscillator source (`∿`).
         pub fn addSine(self: BaseNode, f: Freq, phase: f32) Sine {
