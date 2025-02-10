@@ -1,5 +1,6 @@
 const std = @import("std");
 const bindings = @import("./bindings.zig");
+pub const audio = @import("./audio.zig");
 
 comptime {
     std.testing.refAllDecls(@This());
