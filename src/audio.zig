@@ -139,6 +139,24 @@ fn Node(comptime T: type) type {
             const id = bindings.add_clip(self.id, low, high);
             return Clip{ .id = id };
         }
+
+        /// Reset the node state to how it was when it was just added.
+        pub fn reset(self: BaseNode) void {
+            bindings.reset(self.id);
+        }
+
+        /// Reset the node and all child nodes to the state to how it was when they were just added.
+        pub fn reset_all(self: BaseNode) void {
+            bindings.reset_all(self.id);
+        }
+
+        /// Remove all child nodes.
+        ///
+        /// After it is called, you should make sure to discard all references to the old
+        /// child nodes.
+        pub fn clear(self: BaseNode) void {
+            bindings.clear(self.id);
+        }
     };
 }
 
@@ -155,28 +173,93 @@ pub fn LinearModulator(start: f32, end: f32, start_at: Time, end_at: Time) Modul
 pub const BaseNode = Node(struct {});
 
 pub const Sine = Node(struct {
-    pub fn modulate(self: Sine, mod: Modulator) void {
+    /// Modulate oscillation frequency.
+    pub fn modulate(self: BaseNode, mod: Modulator) void {
         mod(self.id, 0);
     }
 });
 pub const Mix = Node(struct {});
 pub const AllForOne = Node(struct {});
-pub const Gain = Node(struct {});
+pub const Gain = Node(struct {
+    /// Modulate the gain level.
+    pub fn modulate(self: BaseNode, mod: Modulator) void {
+        mod(self.id, 0);
+    }
+});
 pub const Loop = Node(struct {});
 pub const Concat = Node(struct {});
-pub const Pan = Node(struct {});
-pub const Mute = Node(struct {});
-pub const Pause = Node(struct {});
+pub const Pan = Node(struct {
+    /// Modulate the pan value (from 0. to 1.: 0. is only left, 1. is only right).
+    pub fn modulate(self: BaseNode, mod: Modulator) void {
+        mod(self.id, 0);
+    }
+});
+pub const Mute = Node(struct {
+    /// Modulate the muted state.
+    ///
+    /// Below 0.5 is muted, above is unmuted.
+    pub fn modulate(self: BaseNode, mod: Modulator) void {
+        mod(self.id, 0);
+    }
+});
+pub const Pause = Node(struct {
+    /// Modulate the paused state.
+    ///
+    /// Below 0.5 is paused, above is playing.
+    pub fn modulate(self: BaseNode, mod: Modulator) void {
+        mod(self.id, 0);
+    }
+});
 pub const TrackPosition = Node(struct {});
-pub const LowPass = Node(struct {});
-pub const HighPass = Node(struct {});
+pub const LowPass = Node(struct {
+    /// Modulate the cut-off frequency.
+    pub fn modulate_freq(self: BaseNode, mod: Modulator) void {
+        mod(self.id, 0);
+    }
+});
+pub const HighPass = Node(struct {
+    /// Modulate the cut-off frequency.
+    pub fn modulate_freq(self: BaseNode, mod: Modulator) void {
+        mod(self.id, 0);
+    }
+});
 pub const TakeLeft = Node(struct {});
 pub const TakeRight = Node(struct {});
 pub const Swap = Node(struct {});
-pub const Clip = Node(struct {});
-pub const Square = Node(struct {});
-pub const Sawtooth = Node(struct {});
-pub const Triangle = Node(struct {});
+pub const Clip = Node(struct {
+    /// Modulate the low cut amplitude and adjust the high amplitude to keep the gap.
+    ///
+    /// In other words, the difference between low and high cut points will stay the same.
+    pub fn modulate_both(self: BaseNode, mod: Modulator) void {
+        mod(self.id, 0);
+    }
+    /// Modulate the low cut amplitude.
+    pub fn modulate_low(self: BaseNode, mod: Modulator) void {
+        mod(self.id, 1);
+    }
+    /// Modulate the high cut amplitude.
+    pub fn modulate_high(self: BaseNode, mod: Modulator) void {
+        mod(self.id, 2);
+    }
+});
+pub const Square = Node(struct {
+    /// Modulate oscillation frequency.
+    pub fn modulate(self: BaseNode, mod: Modulator) void {
+        mod(self.id, 0);
+    }
+});
+pub const Sawtooth = Node(struct {
+    /// Modulate oscillation frequency.
+    pub fn modulate(self: BaseNode, mod: Modulator) void {
+        mod(self.id, 0);
+    }
+});
+pub const Triangle = Node(struct {
+    /// Modulate oscillation frequency.
+    pub fn modulate(self: BaseNode, mod: Modulator) void {
+        mod(self.id, 0);
+    }
+});
 pub const Noise = Node(struct {});
 pub const Empty = Node(struct {});
 pub const Zero = Node(struct {});
