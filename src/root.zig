@@ -103,6 +103,7 @@ pub const Font = File;
 pub const Image = File;
 pub const Canvas = Image;
 pub const String = []const u8;
+pub const Stash = []u8;
 
 pub const SubImage = struct {
     point: Point,
@@ -451,4 +452,16 @@ pub fn getMe() Peer {
 /// Get the list of peers online.
 pub fn getPeers() Peers {
     return Peers{bindings.get_peers()};
+}
+
+pub fn saveStash(p: Peer, s: Stash) void {
+    bindings.save_stash(@intFromEnum(p), @intFromPtr(s.ptr), s.len);
+}
+
+pub fn loadStash(p: Peer, s: Stash) ?Stash {
+    const size = bindings.load_stash(@intFromEnum(p), @intFromPtr(s.ptr), s.len);
+    if (size == 0) {
+        return null;
+    }
+    return s[0..size];
 }
