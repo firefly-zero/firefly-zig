@@ -100,7 +100,7 @@ pub extern "graphics" fn draw_image(ptr: u32, len: u32, x: i32, y: i32) void;
 pub extern "graphics" fn set_canvas(ptr: u32, len: u32) void;
 pub extern "graphics" fn unset_canvas() void;
 
-pub extern "input" fn read_pad(peer: u32) u32;
+pub extern "input" fn read_pad(peer: u32) i32;
 pub extern "input" fn read_buttons(peer: u32) u32;
 
 pub extern "fs" fn get_file_size(path_ptr: u32, path_len: u32) u32;
