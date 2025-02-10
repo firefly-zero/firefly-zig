@@ -11,7 +11,7 @@ fn Node(comptime T: type) type {
         /// Add sine wave oscillator source (`∿`).
         pub fn addSine(self: BaseNode, f: Freq, phase: f32) Sine {
             const id = bindings.add_sine(self.id, f, phase);
-            return Sine{id};
+            return Sine{ .id = id };
         }
     };
 }
@@ -34,4 +34,4 @@ pub const Sine = Node(struct {
     }
 });
 
-pub const out = BaseNode{0};
+pub const out = BaseNode{ .id = 0 };
