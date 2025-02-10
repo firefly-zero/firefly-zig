@@ -1,6 +1,10 @@
 const std = @import("std");
 const bindings = @import("./bindings.zig");
 
+comptime {
+    std.testing.refAllDecls(@This());
+}
+
 pub const width: i32 = 240;
 pub const height: i32 = 160;
 
@@ -119,22 +123,10 @@ pub const Buttons = struct {
     menu: bool,
 };
 
-pub const Peer = packed struct(u8) {
-    pub const combined: @This() = @bitCast(@as(u8, 0xFF));
-    peer0: bool = false,
-    peer1: bool = false,
-    peer2: bool = false,
-    peer3: bool = false,
-    peer4: bool = false,
-    peer5: bool = false,
-    peer6: bool = false,
-    peer7: bool = false,
+pub const Peer = enum(u8) {
+    _,
 
-    fn val(this: @This()) u32 {
-        const cast: u8 = @bitCast(this);
-        const widened: u32 = @intCast(cast);
-        return widened;
-    }
+    pub const combined: @This() = @enumFromInt(0xFF);
 };
 
 pub const Peers = struct {
@@ -338,7 +330,7 @@ pub fn unsetCanvas() void {
 
 /// Get the current touchpad state.
 pub fn readPad(p: Peer) ?Pad {
-    const raw = bindings.read_pad(p.val());
+    const raw = bindings.read_pad(@intFromEnum(p));
     if (raw == 0xffff) {
         return null;
     }
