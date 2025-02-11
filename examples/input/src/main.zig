@@ -60,7 +60,7 @@ fn drawPad() void {
                 .x = pad_radius + @divTrunc(peerPad.x, 20),
                 .y = pad_radius - @divTrunc(peerPad.y, 20),
             };
-            const color = if (peer == me) me_color else peer_color;
+            const color = if (peer.eq(me)) me_color else peer_color;
             const style = ff.Style{
                 .fill_color = ff.Color.none,
                 .stroke_color = color,
@@ -97,7 +97,7 @@ fn drawButtons() void {
     var peers = ff.getPeers().iter();
     while (peers.next()) |peer| {
         const buttons = ff.readButtons(peer);
-        const stroke_color = if (peer == me) me_color else peer_color;
+        const stroke_color = if (peer.eq(me)) me_color else peer_color;
         const style = ff.Style{
             .fill_color = ff.Color.none,
             .stroke_color = stroke_color,

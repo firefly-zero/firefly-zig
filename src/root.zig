@@ -125,17 +125,21 @@ pub const Buttons = struct {
     menu: bool,
 };
 
-pub const Peer = enum(u8) {
-    _,
+pub const Peer = struct {
+    id: u8,
 
-    pub const combined: @This() = @enumFromInt(0xFF);
+    pub const combined = Peer{ .id = 0xFF };
+
+    pub fn eq(self: Peer, other: Peer) bool {
+        return self.id == other.id;
+    }
 };
 
 pub const Peers = struct {
     peers: u32,
 
     pub fn contains(self: Peers, p: Peer) bool {
-        return (self.peers >> p) & 1 != 0;
+        return (self.peers >> p.id) & 1 != 0;
     }
 
     pub fn len(self: Peers) u32 {
@@ -158,7 +162,7 @@ pub const PeersIter = struct {
             self.peer += 1;
             self.peers >>= 1;
             if (peers & 1 != 0) {
-                return Peer(peer);
+                return Peer{ .id = peer };
             }
         }
         return null;
@@ -346,7 +350,7 @@ pub fn unsetCanvas() void {
 
 /// Get the current touchpad state.
 pub fn readPad(p: Peer) ?Pad {
-    const raw = bindings.read_pad(@intFromEnum(p));
+    const raw = bindings.read_pad(p.id);
     if (raw == 0xffff) {
         return null;
     }
@@ -358,7 +362,7 @@ pub fn readPad(p: Peer) ?Pad {
 
 /// Get the currently pressed buttons.
 pub fn readButtons(p: Peer) Buttons {
-    const raw = bindings.read_buttons(p);
+    const raw = bindings.read_buttons(p.id);
     return Buttons{
         .s = raw & 1 != 0,
         .e = (raw >> 1) & 1 != 0,
@@ -461,20 +465,21 @@ pub fn quit() void {
 
 /// Get the peer corresponding to the local device.
 pub fn getMe() Peer {
-    return bindings.get_me();
+    const p = bindings.get_me();
+    return Peer{ .id = @truncate(p) };
 }
 
 /// Get the list of peers online.
 pub fn getPeers() Peers {
-    return Peers{bindings.get_peers()};
+    return Peers{ .peers = bindings.get_peers() };
 }
 
 pub fn saveStash(p: Peer, s: Stash) void {
-    bindings.save_stash(@intFromEnum(p), @intFromPtr(s.ptr), s.len);
+    bindings.save_stash(p.id, @intFromPtr(s.ptr), s.len);
 }
 
 pub fn loadStash(p: Peer, s: Stash) ?Stash {
-    const size = bindings.load_stash(@intFromEnum(p), @intFromPtr(s.ptr), s.len);
+    const size = bindings.load_stash(p.id, @intFromPtr(s.ptr), s.len);
     if (size == 0) {
         return null;
     }
@@ -494,7 +499,7 @@ pub fn getProgress(p: Peer, b: Badge) Progress {
 /// If the Peer is [`Peer.combined`], the progress is added to every peer
 /// and the returned value is the lowest progress.
 pub fn addProgress(p: Peer, b: Badge, val: i32) Progress {
-    const raw = bindings.add_progress(@intFromEnum(p), b, val);
+    const raw = bindings.add_progress(p.id, b, val);
     return Progress{
         .done = @intCast(@as(i16, @truncate(raw >> 16))),
         .goal = @intCast(@as(i16, @truncate(raw & 0xFFFF))),
@@ -514,6 +519,6 @@ pub fn getScore(p: Peer, b: Board) i16 {
 /// If the Peer is [`Peer.combined`], the score is added for every peer
 /// and the returned value is the lowest of their best scores.
 pub fn addScore(p: Peer, b: Board, val: i16) i16 {
-    const raw = bindings.add_score(@intFromEnum(p), b, val);
+    const raw = bindings.add_score(p.id, b, val);
     return @intCast(@as(i16, @truncate(raw & 0xFFFF)));
 }
