@@ -343,10 +343,43 @@ fn Node(comptime T: type) type {
 
 pub const Modulator = fn (node_id: u32, param: u32) void;
 
+/// Linear (ramp up or down) envelope.
+///
+/// It looks like this: `⎽╱⎺` or `⎺╲⎽`.
+///
+/// The value before `start_at` is `start`, the value after `end_at` is `end`,
+/// and the value between `start_at` and `end_at` changes linearly from `start` to `end`.
 pub fn LinearModulator(start: f32, end: f32, start_at: Time, end_at: Time) Modulator {
     return struct {
         fn mod(node_id: u32, param: u32) void {
             bindings.mod_linear(node_id, param, start, end, start_at.s, end_at.s);
+        }
+    }.mod;
+}
+
+/// Hold envelope.
+///
+/// It looks like this: `⎽│⎺` or `⎺│⎽`.
+///
+/// The value before `time` is `before` and the value after `time` is `after`.
+/// Equivalent to [`LinearModulator`] with `start_at` being equal to `end_at`.
+pub fn HoldModulator(before: f32, after: f32, time: Time) Modulator {
+    return struct {
+        fn mod(node_id: u32, param: u32) void {
+            bindings.mod_hold(node_id, param, before, after, time.s);
+        }
+    }.mod;
+}
+
+/// Sine wave low-frequency oscillator.
+///
+/// It looks like this: `∿`.
+///
+/// `low` is the lowest produced value, `high` is the highest.
+pub fn SineModulator(f: Freq, low: f32, high: f32) Modulator {
+    return struct {
+        fn mod(node_id: u32, param: u32) void {
+            bindings.mod_hold(node_id, param, f.h, low, high);
         }
     }.mod;
 }
