@@ -341,21 +341,22 @@ fn Node(comptime T: type) type {
     };
 }
 
-pub const Modulator = fn (node_id: u32, param: u32) void;
-
 /// Linear (ramp up or down) envelope.
 ///
 /// It looks like this: `⎽╱⎺` or `⎺╲⎽`.
 ///
 /// The value before `start_at` is `start`, the value after `end_at` is `end`,
 /// and the value between `start_at` and `end_at` changes linearly from `start` to `end`.
-pub fn LinearModulator(start: f32, end: f32, start_at: Time, end_at: Time) Modulator {
-    return struct {
-        fn mod(node_id: u32, param: u32) void {
-            bindings.mod_linear(node_id, param, start, end, start_at.s, end_at.s);
-        }
-    }.mod;
-}
+pub const LinearModulator = struct {
+    start: f32,
+    end: f32,
+    start_at: Time,
+    end_at: Time,
+
+    pub fn modulate(self: LinearModulator, node_id: u32, param: u32) void {
+        bindings.mod_linear(node_id, param, self.start, self.end, self.start_at.s, self.end_at.s);
+    }
+};
 
 /// Hold envelope.
 ///
@@ -363,33 +364,49 @@ pub fn LinearModulator(start: f32, end: f32, start_at: Time, end_at: Time) Modul
 ///
 /// The value before `time` is `before` and the value after `time` is `after`.
 /// Equivalent to [`LinearModulator`] with `start_at` being equal to `end_at`.
-pub fn HoldModulator(before: f32, after: f32, time: Time) Modulator {
-    return struct {
-        fn mod(node_id: u32, param: u32) void {
-            bindings.mod_hold(node_id, param, before, after, time.s);
-        }
-    }.mod;
-}
+pub const HoldModulator = struct {
+    before: f32,
+    after: f32,
+    time: Time,
+
+    fn modulate(self: HoldModulator, node_id: u32, param: u32) void {
+        bindings.mod_hold(node_id, param, self.before, self.after, self.time.s);
+    }
+};
 
 /// Sine wave low-frequency oscillator.
 ///
 /// It looks like this: `∿`.
 ///
 /// `low` is the lowest produced value, `high` is the highest.
-pub fn SineModulator(f: Freq, low: f32, high: f32) Modulator {
-    return struct {
-        fn mod(node_id: u32, param: u32) void {
-            bindings.mod_hold(node_id, param, f.h, low, high);
+pub const SineModulator = struct {
+    f: Freq,
+    low: f32,
+    high: f32,
+
+    fn modulate(self: SineModulator, node_id: u32, param: u32) void {
+        bindings.mod_sine(node_id, param, self.f.h, self.low, self.high);
+    }
+};
+
+pub const Modulator = union(enum) {
+    linear: LinearModulator,
+    hold: HoldModulator,
+    sine: SineModulator,
+
+    fn modulate(self: Modulator, node_id: u32, param: u32) void {
+        switch (self) {
+            inline else => |case| case.modulate(node_id, param),
         }
-    }.mod;
-}
+    }
+};
 
 pub const BaseNode = Node(struct {});
 
 pub const Sine = Node(struct {
     /// Modulate oscillation frequency.
     pub fn modulate(self: Sine, mod: Modulator) void {
-        mod(self.id, 0);
+        mod.modulate(self.id, 0);
     }
 });
 pub const Mix = Node(struct {});
@@ -397,7 +414,7 @@ pub const AllForOne = Node(struct {});
 pub const Gain = Node(struct {
     /// Modulate the gain level.
     pub fn modulate(self: Gain, mod: Modulator) void {
-        mod(self.id, 0);
+        mod.modulate(self.id, 0);
     }
 });
 pub const Loop = Node(struct {});
@@ -405,7 +422,7 @@ pub const Concat = Node(struct {});
 pub const Pan = Node(struct {
     /// Modulate the pan value (from 0. to 1.: 0. is only left, 1. is only right).
     pub fn modulate(self: Pan, mod: Modulator) void {
-        mod(self.id, 0);
+        mod.modulate(self.id, 0);
     }
 });
 pub const Mute = Node(struct {
@@ -413,7 +430,7 @@ pub const Mute = Node(struct {
     ///
     /// Below 0.5 is muted, above is unmuted.
     pub fn modulate(self: Mute, mod: Modulator) void {
-        mod(self.id, 0);
+        mod.modulate(self.id, 0);
     }
 });
 pub const Pause = Node(struct {
@@ -421,20 +438,20 @@ pub const Pause = Node(struct {
     ///
     /// Below 0.5 is paused, above is playing.
     pub fn modulate(self: Pause, mod: Modulator) void {
-        mod(self.id, 0);
+        mod.modulate(self.id, 0);
     }
 });
 pub const TrackPosition = Node(struct {});
 pub const LowPass = Node(struct {
     /// Modulate the cut-off frequency.
     pub fn modulate_freq(self: LowPass, mod: Modulator) void {
-        mod(self.id, 0);
+        mod.modulate(self.id, 0);
     }
 });
 pub const HighPass = Node(struct {
     /// Modulate the cut-off frequency.
     pub fn modulate_freq(self: HighPass, mod: Modulator) void {
-        mod(self.id, 0);
+        mod.modulate(self.id, 0);
     }
 });
 pub const TakeLeft = Node(struct {});
@@ -445,33 +462,33 @@ pub const Clip = Node(struct {
     ///
     /// In other words, the difference between low and high cut points will stay the same.
     pub fn modulate_both(self: Clip, mod: Modulator) void {
-        mod(self.id, 0);
+        mod.modulate(self.id, 0);
     }
     /// Modulate the low cut amplitude.
     pub fn modulate_low(self: Clip, mod: Modulator) void {
-        mod(self.id, 1);
+        mod.modulate(self.id, 1);
     }
     /// Modulate the high cut amplitude.
     pub fn modulate_high(self: Clip, mod: Modulator) void {
-        mod(self.id, 2);
+        mod.modulate(self.id, 2);
     }
 });
 pub const Square = Node(struct {
     /// Modulate oscillation frequency.
     pub fn modulate(self: Square, mod: Modulator) void {
-        mod(self.id, 0);
+        mod.modulate(self.id, 0);
     }
 });
 pub const Sawtooth = Node(struct {
     /// Modulate oscillation frequency.
     pub fn modulate(self: Sawtooth, mod: Modulator) void {
-        mod(self.id, 0);
+        mod.modulate(self.id, 0);
     }
 });
 pub const Triangle = Node(struct {
     /// Modulate oscillation frequency.
     pub fn modulate(self: Triangle, mod: Modulator) void {
-        mod(self.id, 0);
+        mod.modulate(self.id, 0);
     }
 });
 pub const Noise = Node(struct {});
