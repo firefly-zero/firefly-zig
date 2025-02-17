@@ -455,7 +455,7 @@ pub fn setSeed(seed: u32) void {
 
 /// Get a random value.
 pub fn getRandom() u32 {
-    bindings.get_random();
+    return bindings.get_random();
 }
 
 /// Exit the app after the current update is finished.
