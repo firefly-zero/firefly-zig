@@ -86,6 +86,14 @@ pub extern "graphics" fn draw_text(
     y: i32,
     color: i32,
 ) void;
+pub extern "graphics" fn draw_qr(
+    ptr: u32,
+    len: u32,
+    x: i32,
+    y: i32,
+    black: i32,
+    white: i32,
+) void;
 pub extern "graphics" fn draw_sub_image(
     ptr: u32,
     len: u32,

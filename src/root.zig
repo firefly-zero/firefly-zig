@@ -317,6 +317,18 @@ pub fn drawText(t: String, f: Font, p: Point, c: Color) void {
     );
 }
 
+// Render QR code for the given text.
+pub fn drawQR(t: String, p: Point, black: Color, white: Color) void {
+    bindings.draw_qr(
+        @intFromPtr(t.ptr),
+        t.len,
+        p.x,
+        p.y,
+        @intFromEnum(black),
+        @intFromEnum(white),
+    );
+}
+
 /// Render an image using the given colors.
 pub fn drawImage(i: Image, p: Point) void {
     bindings.draw_image(@intFromPtr(i.ptr), i.len, p.x, p.y);
