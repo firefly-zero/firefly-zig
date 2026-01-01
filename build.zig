@@ -1,7 +1,7 @@
 const std = @import("std");
 
 pub fn build(b: *std.Build) !void {
-    const target = std.zig.CrossTarget{
+    const target: std.Target.Query = .{
         .cpu_arch = std.Target.Cpu.Arch.wasm32,
         .os_tag = std.Target.Os.Tag.freestanding,
     };

@@ -26,22 +26,22 @@ pub const Angle = struct {
     radians: f32,
 
     /// The 360° angle.
-    pub const full_circle: Angle = Angle(tau);
+    pub const full_circle: Angle = .{ .radians = tau };
     /// The 180° angle.
-    pub const half_circle: Angle = Angle(pi);
+    pub const half_circle: Angle = .{ .radians = pi };
     /// The 90° angle.
-    pub const quarter_circle: Angle = Angle(pi / 2.0);
+    pub const quarter_circle: Angle = .{ .radians = pi / 2.0 };
     /// The 0° angle.
-    pub const zero: Angle = Angle(0.0);
+    pub const zero: Angle = .{ .radians = 0.0 };
 
     /// An angle in radians where Tau (doubled Pi) is the full circle.
-    pub fn from_radians(r: f32) Angle {
-        return Angle{r};
+    pub fn fromRadians(r: f32) Angle {
+        return .{ .radians = r };
     }
 
     /// An angle in degrees where 360.0 is the full circle.
-    pub fn from_degrees(d: f32) Angle {
-        return Angle{d * pi / 180.0};
+    pub fn fromDegrees(d: f32) Angle {
+        return .{ .radians = d * pi / 180.0 };
     }
 };
 
