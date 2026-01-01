@@ -1,6 +1,7 @@
 .{
-    .name = "main",
+    .name = .main,
     .version = "0.0.0",
+    .fingerprint = 0xbf28cd646c6144a4,
     .dependencies = .{
         .firefly = .{
             .path = "../../",

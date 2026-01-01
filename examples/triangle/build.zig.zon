@@ -1,6 +1,7 @@
 .{
-    .name = "triangle",
+    .name = .triangle,
     .version = "0.0.0",
+    .fingerprint = 0xdf976d877118d5a0,
     .dependencies = .{
         .firefly = .{
             .path = "../../",
