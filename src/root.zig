@@ -125,6 +125,17 @@ pub const Pad = struct {
         const down = self.y <= -dpad_threshold;
         return .{ .left = left, .right = right, .up = up, .down = down };
     }
+
+    pub fn radius(self: Pad) f32 {
+        const r_squared = self.x * self.x + self.y * self.y;
+        return std.math.sqrt(@as(f32, @floatFromInt(r_squared)));
+    }
+
+    pub fn azimuth(self: Pad) Angle {
+        const float_y: f32 = @floatFromInt(self.y);
+        const float_x: f32 = @floatFromInt(self.x);
+        return .{ .radians = std.math.atan2(float_y, float_x) };
+    }
 };
 
 pub const DPad = struct {
