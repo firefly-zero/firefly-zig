@@ -168,6 +168,37 @@ pub const Buttons = struct {
     w: bool,
     n: bool,
     menu: bool,
+
+    pub fn any(self: Buttons) bool {
+        return self.s or self.e or self.w or self.n or self.menu;
+    }
+
+    pub fn justPressed(self: Buttons, prev: Buttons) Buttons {
+        const s = self.s and !prev.s;
+        const e = self.e and !prev.e;
+        const w = self.w and !prev.w;
+        const n = self.n and !prev.n;
+        const menu = self.menu and !prev.menu;
+        return .{ .s = s, .e = e, .w = w, .n = n, .menu = menu };
+    }
+
+    pub fn justReleased(self: Buttons, prev: Buttons) Buttons {
+        const s = !self.s and prev.s;
+        const e = !self.e and prev.e;
+        const w = !self.w and prev.w;
+        const n = !self.n and prev.n;
+        const menu = !self.menu and prev.menu;
+        return .{ .s = s, .e = e, .w = w, .n = n, .menu = menu };
+    }
+
+    pub fn held(self: Buttons, prev: Buttons) Buttons {
+        const s = self.s and prev.s;
+        const e = self.e and prev.e;
+        const w = self.w and prev.w;
+        const n = self.n and prev.n;
+        const menu = self.menu and prev.menu;
+        return .{ .s = s, .e = e, .w = w, .n = n, .menu = menu };
+    }
 };
 
 pub const Peer = struct {
