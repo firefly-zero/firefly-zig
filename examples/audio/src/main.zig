@@ -1,8 +1,8 @@
 const ff = @import("firefly");
 
 pub export fn boot() void {
-    const gain = ff.audio.out.addGain(1.0);
-    _ = gain.addSine(ff.audio.Freq.a4, 0.0);
+    const gain = ff.audio.out.node.addGain(1.0);
+    _ = gain.node.addSine(ff.audio.Freq.a4, 0.0);
     const mod = ff.audio.LinearModulator{
         .start = 0,
         .end = 1,
