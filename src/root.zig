@@ -12,6 +12,8 @@ pub const height: i32 = 160;
 const pi: f32 = 3.14159265358979323846264338327950288;
 const tau: f32 = 6.28318530717958647692528676655900577;
 
+const dpad_threshold: i32 = 100;
+
 pub const Point = struct {
     x: i32,
     y: i32,
@@ -115,6 +117,49 @@ pub const SubImage = struct {
 pub const Pad = struct {
     x: i32,
     y: i32,
+
+    pub fn toDPad(self: Pad) DPad {
+        const left = self.x <= -dpad_threshold;
+        const right = self.x >= dpad_threshold;
+        const up = self.y >= dpad_threshold;
+        const down = self.y <= -dpad_threshold;
+        return .{ .left = left, .right = right, .up = up, .down = down };
+    }
+};
+
+pub const DPad = struct {
+    left: bool,
+    right: bool,
+    up: bool,
+    down: bool,
+
+    pub fn any(self: DPad) bool {
+        return self.left or self.right or self.up or self.down;
+    }
+
+    pub fn justPressed(self: DPad, prev: DPad) DPad {
+        const left = self.left and !prev.left;
+        const right = self.right and !prev.right;
+        const up = self.up and !prev.up;
+        const down = self.down and !prev.down;
+        return .{ .left = left, .right = right, .up = up, .down = down };
+    }
+
+    pub fn justReleased(self: DPad, prev: DPad) DPad {
+        const left = !self.left and prev.left;
+        const right = !self.right and prev.right;
+        const up = !self.up and prev.up;
+        const down = !self.down and prev.down;
+        return .{ .left = left, .right = right, .up = up, .down = down };
+    }
+
+    pub fn held(self: DPad, prev: DPad) DPad {
+        const left = self.left and prev.left;
+        const right = self.right and prev.right;
+        const up = self.up and prev.up;
+        const down = self.down and prev.down;
+        return .{ .left = left, .right = right, .up = up, .down = down };
+    }
 };
 
 pub const Buttons = struct {
