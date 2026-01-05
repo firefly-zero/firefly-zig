@@ -1,4 +1,9 @@
+const std = @import("std");
 const bindings = @import("./bindings.zig").audio;
+
+comptime {
+    std.testing.refAllDecls(@This());
+}
 
 pub const sample_rate: u32 = 44_100;
 
@@ -423,7 +428,7 @@ pub const Sine = struct {
 pub const Mix = Node;
 pub const AllForOne = Node;
 pub const Gain = struct {
-    id:u32,
+    id: u32,
     node: NodeMixin(@This()) = .{},
     /// Modulate the gain level.
     pub fn modulate(self: Gain, mod: Modulator) void {
