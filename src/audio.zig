@@ -516,7 +516,7 @@ pub const Sawtooth = struct {
 };
 pub const Triangle = struct {
     id: u32,
-    node: NodeMixin(@This()),
+    node: NodeMixin(@This()) = .{},
     /// Modulate oscillation frequency.
     pub fn modulate(self: Triangle, mod: Modulator) void {
         mod.modulate(self.id, 0);
