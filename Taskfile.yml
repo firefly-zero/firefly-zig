@@ -17,13 +17,16 @@ tasks:
       - zig fmt .
   test:audio:
     dir: examples/audio
-    cmds: [zig build]
+    cmds:
+      - zig build
   test:input:
     dir: examples/input
-    cmds: [zig build]
+    cmds:
+      - zig build
   test:triangle:
     dir: examples/triangle
-    cmds: [zig build]
+    cmds:
+      - zig build
   test:
     desc: "run tests"
     cmds:
