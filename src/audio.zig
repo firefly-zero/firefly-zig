@@ -240,6 +240,12 @@ fn NodeMixin(comptime T: type) type {
             return Zero{ .id = id };
         }
 
+        /// Play an audio file from ROM.
+        pub fn addFile(self: *const Self, path: []const u8) File {
+            const id = bindings.add_file(self.parentId(), @intFromPtr(path.ptr), path.len);
+            return File{ .id = id };
+        }
+
         /// Add node simply mixing all inputs.
         pub fn addMix(self: *const Self) Mix {
             const id = bindings.add_mix(self.parentId());
