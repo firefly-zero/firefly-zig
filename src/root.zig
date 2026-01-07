@@ -215,7 +215,7 @@ pub const Buttons = struct {
 pub const Peer = struct {
     id: u8,
 
-    pub const combined = Peer{ .id = 0xFF };
+    pub const combined: Peer = .{ .id = 0xFF };
 
     pub fn eq(self: Peer, other: Peer) bool {
         return self.id == other.id;
@@ -234,7 +234,7 @@ pub const Peers = struct {
     }
 
     pub fn iter(self: Peers) PeersIter {
-        return PeersIter{ .peer = 0, .peers = self.peers };
+        return .{ .peer = 0, .peers = self.peers };
     }
 };
 
@@ -249,7 +249,7 @@ pub const PeersIter = struct {
             self.peer += 1;
             self.peers >>= 1;
             if (peers & 1 != 0) {
-                return Peer{ .id = peer };
+                return .{ .id = peer };
             }
         }
         return null;
@@ -453,7 +453,7 @@ pub fn readPad(p: Peer) ?Pad {
     if (raw == 0xffff) {
         return null;
     }
-    return Pad{
+    return .{
         .x = @intCast(@as(i16, @truncate(raw >> 16))),
         .y = @intCast(@as(i16, @truncate(raw & 0xFFFF))),
     };
@@ -462,7 +462,7 @@ pub fn readPad(p: Peer) ?Pad {
 /// Get the currently pressed buttons.
 pub fn readButtons(p: Peer) Buttons {
     const raw = bindings.read_buttons(p.id);
-    return Buttons{
+    return .{
         .s = raw & 1 != 0,
         .e = (raw >> 1) & 1 != 0,
         .w = (raw >> 2) & 1 != 0,
@@ -565,12 +565,12 @@ pub fn quit() void {
 /// Get the peer corresponding to the local device.
 pub fn getMe() Peer {
     const p = bindings.get_me();
-    return Peer{ .id = @truncate(p) };
+    return .{ .id = @truncate(p) };
 }
 
 /// Get the list of peers online.
 pub fn getPeers() Peers {
-    return Peers{ .peers = bindings.get_peers() };
+    return .{ .peers = bindings.get_peers() };
 }
 
 pub fn saveStash(p: Peer, s: Stash) void {
@@ -599,7 +599,7 @@ pub fn getProgress(p: Peer, b: Badge) Progress {
 /// and the returned value is the lowest progress.
 pub fn addProgress(p: Peer, b: Badge, val: i32) Progress {
     const raw = bindings.add_progress(p.id, b, val);
-    return Progress{
+    return .{
         .done = @intCast(@as(i16, @truncate(raw >> 16))),
         .goal = @intCast(@as(i16, @truncate(raw & 0xFFFF))),
     };
