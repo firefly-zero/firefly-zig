@@ -12,7 +12,8 @@ pub const height: i32 = 160;
 const pi: f32 = 3.14159265358979323846264338327950288;
 const tau: f32 = 6.28318530717958647692528676655900577;
 
-const dpad_threshold: i32 = 100;
+const dpad4_threshold: i32 = 100;
+const dpad8_threshold: i32 = 100;
 
 pub const Point = struct {
     x: i32,
@@ -118,12 +119,33 @@ pub const Pad = struct {
     x: i32,
     y: i32,
 
-    pub fn toDPad(self: Pad) DPad {
-        const left = self.x <= -dpad_threshold;
-        const right = self.x >= dpad_threshold;
-        const up = self.y >= dpad_threshold;
-        const down = self.y <= -dpad_threshold;
-        return .{ .left = left, .right = right, .up = up, .down = down };
+    pub fn toDPad4(self: Pad) DPad4 {
+        const x = self.x;
+        const y = self.y;
+        const absX = x.abs();
+        const absY = y.abs();
+        if (y > dpad4_threshold and y > absX) {
+            return .up;
+        }
+        if (y < -dpad4_threshold and -y > absX) {
+            return .down;
+        }
+        if (x > dpad4_threshold and x > absY) {
+            return .right;
+        }
+        if (x < -dpad4_threshold and -x > absY) {
+            return .left;
+        }
+        return .none;
+    }
+
+    pub fn toDPad8(self: Pad) DPad8 {
+        return .{
+            .left = self.x <= -dpad8_threshold,
+            .right = self.x >= dpad8_threshold,
+            .up = self.y >= dpad8_threshold,
+            .down = self.y <= -dpad8_threshold,
+        };
     }
 
     pub fn radius(self: Pad) f32 {
@@ -138,38 +160,113 @@ pub const Pad = struct {
     }
 };
 
-pub const DPad = struct {
+/// 4-directional DPad-like representation of the Pad.
+///
+/// Constructed with Pad.toDPad4. Useful for simple games and ports.
+/// The middle of the pad is a "dead zone" pressing which will not activate any direction.
+///
+/// Implements all the same methods as DPad8.
+pub const DPad4 = enum(i32) {
+    none,
+    left,
+    right,
+    up,
+    down,
+
+    /// Check if any direction is pressed.
+    pub fn any(self: DPad4) bool {
+        return self != DPad4.none;
+    }
+
+    /// Given the old state, get directions that were not pressed but are pressed now.
+    pub fn justPressed(self: DPad4, prev: DPad4) DPad4 {
+        if (self == prev) {
+            return .none;
+        } else {
+            return self;
+        }
+    }
+
+    /// Given the old state, get directions that were pressed but aren't pressed now.
+    pub fn justReleased(self: DPad4, prev: DPad4) DPad4 {
+        if (self == prev) {
+            return .none;
+        } else {
+            return prev;
+        }
+    }
+
+    /// Given the old state, get directions that were pressed and are still pressed now.
+    pub fn held(self: DPad4, prev: DPad4) DPad4 {
+        if (self == prev) {
+            return self;
+        } else {
+            return .none;
+        }
+    }
+};
+
+/// 8-directional DPad-like representation of the Pad.
+///
+/// Constructed with Pad.toDPad8. Useful for simple games and ports.
+/// The middle of the pad is a "dead zone" pressing which will not activate any direction.
+///
+/// Implements all the same methods as DPad4.
+///
+/// Invariant: it's not possible for opposite directions (left and right, or down and up)
+/// to be active at the same time. However, it's possible for heighboring directions
+/// (like up and right) to be active at the same time if the player presses a diagonal.
+///
+/// For completeness, here is the full list of possible states:
+///
+/// * right
+/// * right and up
+/// * up
+/// * left and up
+/// * left
+/// * left and down
+/// * down
+/// * right and down
+/// * none
+pub const DPad8 = struct {
     left: bool,
     right: bool,
     up: bool,
     down: bool,
 
-    pub fn any(self: DPad) bool {
+    /// Check if any direction is pressed.
+    pub fn any(self: DPad8) bool {
         return self.left or self.right or self.up or self.down;
     }
 
-    pub fn justPressed(self: DPad, prev: DPad) DPad {
-        const left = self.left and !prev.left;
-        const right = self.right and !prev.right;
-        const up = self.up and !prev.up;
-        const down = self.down and !prev.down;
-        return .{ .left = left, .right = right, .up = up, .down = down };
+    /// Given the old state, get directions that were not pressed but are pressed now.
+    pub fn justPressed(self: DPad8, prev: DPad8) DPad8 {
+        return .{
+            .left = self.left and !prev.left,
+            .right = self.right and !prev.right,
+            .up = self.up and !prev.up,
+            .down = self.down and !prev.down,
+        };
     }
 
-    pub fn justReleased(self: DPad, prev: DPad) DPad {
-        const left = !self.left and prev.left;
-        const right = !self.right and prev.right;
-        const up = !self.up and prev.up;
-        const down = !self.down and prev.down;
-        return .{ .left = left, .right = right, .up = up, .down = down };
+    /// Given the old state, get directions that were pressed but aren't pressed now.
+    pub fn justReleased(self: DPad8, prev: DPad8) DPad8 {
+        return .{
+            .left = !self.left and prev.left,
+            .right = !self.right and prev.right,
+            .up = !self.up and prev.up,
+            .down = !self.down and prev.down,
+        };
     }
 
-    pub fn held(self: DPad, prev: DPad) DPad {
-        const left = self.left and prev.left;
-        const right = self.right and prev.right;
-        const up = self.up and prev.up;
-        const down = self.down and prev.down;
-        return .{ .left = left, .right = right, .up = up, .down = down };
+    /// Given the old state, get directions that were pressed and are still pressed now.
+    pub fn held(self: DPad8, prev: DPad8) DPad8 {
+        return .{
+            .left = self.left and prev.left,
+            .right = self.right and prev.right,
+            .up = self.up and prev.up,
+            .down = self.down and prev.down,
+        };
     }
 };
 
@@ -185,30 +282,33 @@ pub const Buttons = struct {
     }
 
     pub fn justPressed(self: Buttons, prev: Buttons) Buttons {
-        const s = self.s and !prev.s;
-        const e = self.e and !prev.e;
-        const w = self.w and !prev.w;
-        const n = self.n and !prev.n;
-        const menu = self.menu and !prev.menu;
-        return .{ .s = s, .e = e, .w = w, .n = n, .menu = menu };
+        return .{
+            .s = self.s and !prev.s,
+            .e = self.e and !prev.e,
+            .w = self.w and !prev.w,
+            .n = self.n and !prev.n,
+            .menu = self.menu and !prev.menu,
+        };
     }
 
     pub fn justReleased(self: Buttons, prev: Buttons) Buttons {
-        const s = !self.s and prev.s;
-        const e = !self.e and prev.e;
-        const w = !self.w and prev.w;
-        const n = !self.n and prev.n;
-        const menu = !self.menu and prev.menu;
-        return .{ .s = s, .e = e, .w = w, .n = n, .menu = menu };
+        return .{
+            .s = !self.s and prev.s,
+            .e = !self.e and prev.e,
+            .w = !self.w and prev.w,
+            .n = !self.n and prev.n,
+            .menu = !self.menu and prev.menu,
+        };
     }
 
     pub fn held(self: Buttons, prev: Buttons) Buttons {
-        const s = self.s and prev.s;
-        const e = self.e and prev.e;
-        const w = self.w and prev.w;
-        const n = self.n and prev.n;
-        const menu = self.menu and prev.menu;
-        return .{ .s = s, .e = e, .w = w, .n = n, .menu = menu };
+        return .{
+            .s = self.s and prev.s,
+            .e = self.e and prev.e,
+            .w = self.w and prev.w,
+            .n = self.n and prev.n,
+            .menu = self.menu and prev.menu,
+        };
     }
 };
 

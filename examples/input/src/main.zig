@@ -56,7 +56,7 @@ fn drawBg() void {
 fn drawPad() void {
     const maybePad = ff.readPad(ff.Peer.combined);
     if (maybePad) |pad| {
-        const dpad = pad.toDPad();
+        const dpad = pad.toDPad8();
         const t_style: ff.Style = .{
             .fill_color = .green,
             .stroke_color = .black,
