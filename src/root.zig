@@ -4,7 +4,24 @@ pub const audio = @import("./audio.zig");
 
 // Execute all branches of code at compile-time to find all type errors.
 comptime {
-    const T = @This();
+    compile(@This());
+    compile(Point);
+    compile(Size);
+    compile(Angle);
+    compile(RGB);
+    compile(Style);
+    compile(LineStyle);
+    compile(SubImage);
+    compile(Pad);
+    compile(DPad8);
+    compile(Buttons);
+    compile(Peer);
+    compile(Peers);
+    compile(PeersIter);
+    compile(Progress);
+}
+
+fn compile(T: type) void {
     const decls = @typeInfo(T).@"struct".decls;
     for (decls) |decl| {
         _ = &@field(T, decl.name);
