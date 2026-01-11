@@ -602,8 +602,10 @@ pub fn loadFileBuf(path: String, alloc: std.mem.Allocator) ?[]u8 {
     if (size == 0) {
         return null;
     }
-    const buf = try alloc.alloc(u8, size);
-    bindings.load_file(@intFromPtr(path.ptr), path.len, @intFromPtr(buf.ptr), buf.len);
+    const buf = alloc.alloc(u8, size) catch {
+        return null;
+    };
+    _ = bindings.load_file(@intFromPtr(path.ptr), path.len, @intFromPtr(buf.ptr), buf.len);
     return buf;
 }
 
@@ -612,7 +614,7 @@ pub fn loadFileBuf(path: String, alloc: std.mem.Allocator) ?[]u8 {
 /// If the file exists, it will be overwritten.
 /// If it doesn't exist, it will be created.
 pub fn dumpFile(path: String, buf: []const u8) void {
-    bindings.dump_file(@intFromPtr(path.ptr), path.len, @intFromPtr(buf.ptr), buf.len);
+    _ = bindings.dump_file(@intFromPtr(path.ptr), path.len, @intFromPtr(buf.ptr), buf.len);
 }
 
 /// Remove file (if exists) with the given name from the data dir.
@@ -704,9 +706,11 @@ pub fn getProgress(p: Peer, b: Badge) Progress {
 /// and the returned value is the lowest progress.
 pub fn addProgress(p: Peer, b: Badge, val: i32) Progress {
     const raw = bindings.add_progress(p.id, b, val);
+    const done: i32 = @intCast(raw >> 16);
+    const goal: i32 = @intCast(raw & 0xFFFF);
     return .{
-        .done = @intCast(@as(i16, @truncate(raw >> 16))),
-        .goal = @intCast(@as(i16, @truncate(raw & 0xFFFF))),
+        .done = @intCast(@as(i16, @truncate(done))),
+        .goal = @intCast(@as(i16, @truncate(goal))),
     };
 }
 
