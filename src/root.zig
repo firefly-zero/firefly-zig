@@ -144,8 +144,8 @@ pub const Pad = struct {
     pub fn toDPad4(self: Pad) DPad4 {
         const x = self.x;
         const y = self.y;
-        const absX = x.abs();
-        const absY = y.abs();
+        const absX = @abs(x);
+        const absY = @abs(y);
         if (y > dpad4_threshold and y > absX) {
             return .up;
         }
@@ -348,7 +348,8 @@ pub const Peers = struct {
     peers: u32,
 
     pub fn contains(self: Peers, p: Peer) bool {
-        return (self.peers >> p.id) & 1 != 0;
+        const x = self.peers >> @truncate(p.id);
+        return x & 1 != 0;
     }
 
     pub fn len(self: Peers) u32 {
