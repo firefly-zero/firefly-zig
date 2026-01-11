@@ -2,8 +2,13 @@ const std = @import("std");
 const bindings = @import("./bindings.zig");
 pub const audio = @import("./audio.zig");
 
+// Execute all branches of code at compile-time to find all type errors.
 comptime {
-    std.testing.refAllDecls(@This());
+    const T = @This();
+    const decls = @typeInfo(T).@"struct".decls;
+    for (decls) |decl| {
+        _ = &@field(T, decl.name);
+    }
 }
 
 pub const width: i32 = 240;
