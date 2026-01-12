@@ -142,20 +142,18 @@ pub const Pad = struct {
     y: i32,
 
     pub fn toDPad4(self: Pad) DPad4 {
-        const x = self.x;
-        const y = self.y;
-        const absX = @abs(x);
-        const absY = @abs(y);
-        if (y > dpad4_threshold and y > absX) {
+        const abs_x = @abs(self.x);
+        const abs_y = @abs(self.y);
+        if (self.y >= dpad4_threshold and abs_y > abs_x) {
             return .up;
         }
-        if (y < -dpad4_threshold and -y > absX) {
+        if (self.y <= -dpad4_threshold and abs_y > abs_x) {
             return .down;
         }
-        if (x > dpad4_threshold and x > absY) {
+        if (self.x >= dpad4_threshold and abs_x > abs_y) {
             return .right;
         }
-        if (x < -dpad4_threshold and -x > absY) {
+        if (self.x <= -dpad4_threshold and abs_x > abs_y) {
             return .left;
         }
         return .none;
@@ -204,27 +202,24 @@ pub const DPad4 = enum(i32) {
     pub fn justPressed(self: DPad4, prev: DPad4) DPad4 {
         if (self == prev) {
             return .none;
-        } else {
-            return self;
         }
+        return self;
     }
 
     /// Given the old state, get directions that were pressed but aren't pressed now.
     pub fn justReleased(self: DPad4, prev: DPad4) DPad4 {
         if (self == prev) {
             return .none;
-        } else {
-            return prev;
         }
+        return prev;
     }
 
     /// Given the old state, get directions that were pressed and are still pressed now.
     pub fn held(self: DPad4, prev: DPad4) DPad4 {
-        if (self == prev) {
-            return self;
-        } else {
+        if (self != prev) {
             return .none;
         }
+        return self;
     }
 };
 
