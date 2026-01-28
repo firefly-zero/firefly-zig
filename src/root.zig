@@ -11,7 +11,11 @@ comptime {
     compile(RGB);
     compile(Style);
     compile(LineStyle);
+    compile(File);
+    compile(Font);
+    compile(Image);
     compile(SubImage);
+    compile(Canvas);
     compile(Pad);
     compile(DPad8);
     compile(Buttons);
@@ -117,6 +121,13 @@ pub const Style = struct {
     fill_color: Color,
     stroke_color: Color,
     stroke_width: i32,
+
+    pub fn toLineStyle(self: Style) LineStyle {
+        return .{
+            .color = self.stroke_color,
+            .width = self.stroke_width,
+        };
+    }
 };
 
 pub const LineStyle = struct {
@@ -124,11 +135,48 @@ pub const LineStyle = struct {
     width: i32,
 };
 
-pub const File = []u8;
-pub const Font = File;
-pub const Image = File;
-pub const Canvas = Image;
+pub const File = struct {
+    raw: []u8,
+
+    pub fn toBytes(self: File) []u8 {
+        return self.raw;
+    }
+
+    pub fn toFont(self: File) Font {
+        return .{ .raw = self.raw };
+    }
+
+    pub fn toImage(self: File) Image {
+        return .{ .raw = self.raw };
+    }
+};
+
+pub const Font = struct {
+    raw: []u8,
+};
+
+pub const Image = struct {
+    raw: []u8,
+
+    pub fn sub(self: Image, p: Point, s: Size) SubImage {
+        return .{
+            .point = p,
+            .size = s,
+            .raw = self.raw,
+        };
+    }
+};
+
+pub const Canvas = struct {
+    raw: []u8,
+
+    pub fn toImage(self: Canvas) Image {
+        return .{ .raw = self.raw };
+    }
+};
+
 pub const String = []const u8;
+
 pub const Stash = []u8;
 
 pub const SubImage = struct {
@@ -514,8 +562,8 @@ pub fn drawText(t: String, f: Font, p: Point, c: Color) void {
     bindings.draw_text(
         @intFromPtr(t.ptr),
         t.len,
-        @intFromPtr(f.ptr),
-        f.len,
+        @intFromPtr(f.raw.ptr),
+        f.raw.len,
         p.x,
         p.y,
         @intFromEnum(c),
@@ -536,7 +584,7 @@ pub fn drawQR(t: String, p: Point, black: Color, white: Color) void {
 
 /// Render an image using the given colors.
 pub fn drawImage(i: Image, p: Point) void {
-    bindings.draw_image(@intFromPtr(i.ptr), i.len, p.x, p.y);
+    bindings.draw_image(@intFromPtr(i.raw.ptr), i.raw.len, p.x, p.y);
 }
 
 /// Draw a subregion of an image.
@@ -557,7 +605,7 @@ pub fn drawSubImage(i: SubImage, p: Point) void {
 
 /// Set canvas to be used for all subsequent drawing operations.
 pub fn setCanvas(c: Canvas) void {
-    bindings.set_canvas(@intFromPtr(c.ptr), c.len);
+    bindings.set_canvas(@intFromPtr(c.raw.ptr), c.raw.len);
 }
 
 /// Unset canvas set by [`set_canvas`]. All subsequent drawing operations will target frame buffer.
@@ -600,9 +648,9 @@ pub fn getFileSize(path: String) u32 {
 ///
 /// If the file size is not known in advance (and so the buffer has to be allocated
 /// dynamically), consider using loadFileBuf() instead.
-pub fn loadFile(path: String, buf: []u8) []u8 {
+pub fn loadFile(path: String, buf: []u8) File {
     const size = bindings.load_file(@intFromPtr(path.ptr), path.len, @intFromPtr(buf.ptr), buf.len);
-    return buf[0..size];
+    return .{ .raw = buf[0..size] };
 }
 
 /// Read the whole file with the given name.
@@ -610,7 +658,7 @@ pub fn loadFile(path: String, buf: []u8) []u8 {
 /// If you have a pre-allocated buffer of the right size, use loadFile() instead.
 ///
 /// null is returned if the file does not exist.
-pub fn loadFileBuf(path: String, alloc: std.mem.Allocator) ?[]u8 {
+pub fn loadFileBuf(path: String, alloc: std.mem.Allocator) ?File {
     const size = bindings.get_file_size(@intFromPtr(path.ptr), path.len);
     if (size == 0) {
         return null;
@@ -619,7 +667,7 @@ pub fn loadFileBuf(path: String, alloc: std.mem.Allocator) ?[]u8 {
         return null;
     };
     _ = bindings.load_file(@intFromPtr(path.ptr), path.len, @intFromPtr(buf.ptr), buf.len);
-    return buf;
+    return .{ .raw = buf };
 }
 
 /// Write the buffer into the given file in the data dir.
