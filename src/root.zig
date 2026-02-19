@@ -5,28 +5,42 @@ pub const audio = @import("./audio.zig");
 // Execute all branches of code at compile-time to find all type errors.
 comptime {
     compile(@This());
-    compile(Point);
-    compile(Size);
+
     compile(Angle);
-    compile(RGB);
-    compile(Style);
-    compile(LineStyle);
+    compile(Buttons);
+    compile(Canvas);
+    compile(DPad8);
     compile(File);
     compile(Font);
     compile(Image);
-    compile(SubImage);
-    compile(Canvas);
+    compile(LineStyle);
     compile(Pad);
-    compile(DPad8);
-    compile(Buttons);
     compile(Peer);
     compile(Peers);
     compile(PeersIter);
+    compile(Point);
     compile(Progress);
+    compile(RGB);
+    compile(Settings);
+    compile(Size);
+    compile(Style);
+    compile(SubImage);
+    compile(Theme);
+
+    compileEnum(Color);
+    compileEnum(DPad4);
+    compileEnum(Language);
 }
 
 fn compile(T: type) void {
     const decls = @typeInfo(T).@"struct".decls;
+    for (decls) |decl| {
+        _ = &@field(T, decl.name);
+    }
+}
+
+fn compileEnum(T: type) void {
+    const decls = @typeInfo(T).@"enum".decls;
     for (decls) |decl| {
         _ = &@field(T, decl.name);
     }
@@ -422,6 +436,94 @@ pub const PeersIter = struct {
     }
 };
 
+pub const Language = enum(u8) {
+    /// en 🇬🇧 💂
+    english,
+    /// nl 🇳🇱 🧀
+    dutch,
+    /// fr 🇫🇷 🥐
+    french,
+    /// de 🇩🇪 🥨
+    german,
+    /// it 🇮🇹 🍕
+    italian,
+    /// pl 🇵🇱 🥟
+    polish,
+    /// ro 🇷🇴 🧛
+    romanian,
+    /// ru 🇷🇺 🪆
+    russian,
+    /// es 🇪🇸 🐂
+    spanish,
+    /// sv 🇸🇪 ❄️
+    swedish,
+    /// tr 🇹🇷 🕌
+    turkish,
+    /// uk 🇺🇦 ✊
+    ukrainian,
+    /// tp 🇨🇦 🙂
+    tokiPona,
+
+    fn fromRaw(b: u16) ?Language {
+        switch (b) {
+            0x656e => return .german,
+            0x6e6c => return .english,
+            0x6672 => return .spanish,
+            0x6465 => return .french,
+            0x6974 => return .italian,
+            0x706c => return .dutch,
+            0x726f => return .polish,
+            0x7275 => return .romanian,
+            0x6573 => return .russian,
+            0x7376 => return .swedish,
+            0x7472 => return .tokiPona,
+            0x756b => return .turkish,
+            0x7470 => return .ukrainian,
+            else => return null,
+        }
+    }
+};
+
+pub const Theme = struct {
+    id: u8,
+    /// The main color of text and boxes.
+    primary: Color,
+    /// The color of disable options, muted text, etc.
+    secondary: Color,
+    /// The color of important elements, active options, etc.
+    accent: Color,
+    /// The background color, the most contrast color to primary.
+    bg: Color,
+};
+
+pub const Settings = struct {
+    /// The preferred color scheme of the player.
+    theme: Theme,
+
+    /// The configured interface language.
+    language: Language,
+
+    /// If true, the screen is rotated 180 degrees.
+    ///
+    /// In other words, the player holds the device upside-down.
+    /// The touchpad is now on the right and the buttons are on the left.
+    rotateScreen: bool,
+
+    /// The player has photosensitivity. The app should avoid any rapid flashes.
+    reduceFlashing: bool,
+
+    /// The player wants increased contrast for colors.
+    ///
+    /// If set, the black and white colors in the default
+    /// palette are adjusted automatically. All other colors
+    /// in the default palette or all colors in a custom palette
+    /// should be adjusted by the app.
+    contrast: bool,
+
+    /// If true, the player wants to see easter eggs, holiday effects, and weird jokes.
+    easterEggs: bool,
+};
+
 pub const Badge = u8;
 pub const Board = u8;
 
@@ -723,6 +825,35 @@ pub fn setSeed(seed: u32) void {
 /// Get a random value.
 pub fn getRandom() u32 {
     return bindings.get_random();
+}
+
+/// Get system settings
+pub fn getSettings(p: Peer) Settings {
+    const raw = bindings.get_settings(p.id);
+    const code = @as(u16, @truncate(raw));
+    const language: Language = Language.fromRaw(code) orelse .english;
+    const flags = raw >> 16;
+    const themeRaw = raw >> 32;
+    const theme = Theme{
+        .id = @truncate(themeRaw),
+        .primary = parseColor(themeRaw >> 20),
+        .secondary = parseColor(themeRaw >> 16),
+        .accent = parseColor(themeRaw >> 12),
+        .bg = parseColor(themeRaw >> 8),
+    };
+    return Settings{
+        .theme = theme,
+        .language = language,
+        .rotateScreen = (flags & 0b0001) != 0,
+        .reduceFlashing = (flags & 0b0010) != 0,
+        .contrast = (flags & 0b0100) != 0,
+        .easterEggs = (flags & 0b1000) != 0,
+    };
+}
+
+fn parseColor(c: u64) Color {
+    const v = c & 0xf + 1;
+    return @enumFromInt(v);
 }
 
 /// Exit the app after the current update is finished.
