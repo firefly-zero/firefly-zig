@@ -53,7 +53,7 @@ const pi: f32 = 3.14159265358979323846264338327950288;
 const tau: f32 = 6.28318530717958647692528676655900577;
 
 const dpad4_threshold: i32 = 300;
-const dpad8_threshold: i32 = 300;
+const dpad8_threshold: i32 = 400;
 
 pub const Point = struct {
     x: i32,
