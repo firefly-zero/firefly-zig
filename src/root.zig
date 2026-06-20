@@ -58,11 +58,15 @@ const dpad8_threshold: i32 = 400;
 pub const Point = struct {
     x: i32,
     y: i32,
+
+    pub const zero: Point = .{ .x = 0, .y = 0 };
 };
 
 pub const Size = struct {
     width: i32,
     height: i32,
+
+    pub const screen: Size = .{ .width = width, .height = height };
 };
 
 pub const Angle = struct {
@@ -698,6 +702,48 @@ pub fn drawSubImage(i: SubImage, p: Point) void {
         i.raw.len,
         p.x,
         p.y,
+        i.point.x,
+        i.point.y,
+        i.size.width,
+        i.size.height,
+    );
+}
+
+/// Tile the given screen area with the provided sub-image.
+pub fn drawSubTile(i: SubImage, p: Point, s: Size) void {
+    bindings.draw_sub_tile(
+        @intFromPtr(i.raw.ptr),
+        i.raw.len,
+        p.x,
+        p.y,
+        s.width,
+        s.height,
+        i.point.x,
+        i.point.y,
+        i.size.width,
+        i.size.height,
+    );
+}
+
+/// Fill the given area with the given 9-slice.
+///
+/// A 9-slice is used to tile an area with 9 sub-images: 4 corners,
+/// 4 edges, and 1 middle segment. It is useful for speech bubbles
+/// and other stylish boxes.
+///
+/// The whole image is the 9-slice. The sub-image is the center area of the 9-slice.
+///
+/// If the target area is bigger than the 9-slice segments,
+/// all the segments (except corners) are repeated ("tiled")
+/// without stretching or mirroring.
+pub fn drawNineSlice(i: SubImage, p: Point, s: Size) void {
+    bindings.draw_nine_slice(
+        @intFromPtr(i.raw.ptr),
+        i.raw.len,
+        p.x,
+        p.y,
+        s.width,
+        s.height,
         i.point.x,
         i.point.y,
         i.size.width,
