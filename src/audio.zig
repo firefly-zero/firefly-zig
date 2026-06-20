@@ -193,157 +193,157 @@ fn NodeMixin(comptime T: type) type {
     return struct {
         const Self = @This();
 
-        fn parentId(self: *const Self) u32 {
+        fn nodeId(self: *const Self) u32 {
             const parent: *const T = @alignCast(@fieldParentPtr("node", self));
             return parent.id;
         }
 
         /// Add sine wave oscillator source (`∿`).
         pub fn addSine(self: *const Self, f: Freq, phase: f32) Sine {
-            const id = bindings.add_sine(self.parentId(), f.h, phase);
+            const id = bindings.add_sine(self.nodeId(), f.h, phase);
             return .{ .id = id };
         }
 
         /// Add square wave oscillator source (`⎍`).
         pub fn addSquare(self: *const Self, f: Freq, phase: f32) Square {
-            const id = bindings.add_square(self.parentId(), f.h, phase);
+            const id = bindings.add_square(self.nodeId(), f.h, phase);
             return .{ .id = id };
         }
 
         /// Add sawtooth wave oscillator source (`╱│`).
         pub fn addSawtooth(self: *const Self, f: Freq, phase: f32) Sawtooth {
-            const id = bindings.add_sawtooth(self.parentId(), f.h, phase);
+            const id = bindings.add_sawtooth(self.nodeId(), f.h, phase);
             return .{ .id = id };
         }
 
         /// Add triangle wave oscillator source (`╱╲`).
         pub fn addTriangle(self: *const Self, f: Freq, phase: f32) Triangle {
-            const id = bindings.add_triangle(self.parentId(), f.h, phase);
+            const id = bindings.add_triangle(self.nodeId(), f.h, phase);
             return .{ .id = id };
         }
 
         /// Add white noise source (amplitude on each tick is random).
         pub fn addNoise(self: *const Self, seed: i32) Noise {
-            const id = bindings.add_noise(self.parentId(), seed);
+            const id = bindings.add_noise(self.nodeId(), seed);
             return .{ .id = id };
         }
 
         /// Add always stopped source.
         pub fn addEmpty(self: *const Self) Empty {
-            const id = bindings.add_empty(self.parentId());
+            const id = bindings.add_empty(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add silent source producing zeros.
         pub fn addZero(self: *const Self) Zero {
-            const id = bindings.add_zero(self.parentId());
+            const id = bindings.add_zero(self.nodeId());
             return .{ .id = id };
         }
 
         /// Play an audio file from ROM.
         pub fn addFile(self: *const Self, path: []const u8) File {
-            const id = bindings.add_file(self.parentId(), @intFromPtr(path.ptr), path.len);
+            const id = bindings.add_file(self.nodeId(), @intFromPtr(path.ptr), path.len);
             return .{ .id = id };
         }
 
         /// Add node simply mixing all inputs.
         pub fn addMix(self: *const Self) Mix {
-            const id = bindings.add_mix(self.parentId());
+            const id = bindings.add_mix(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add mixer node that stops if any of the sources stops.
         pub fn addAllForOne(self: *const Self) AllForOne {
-            const id = bindings.add_all_for_one(self.parentId());
+            const id = bindings.add_all_for_one(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add gain control node.
         pub fn addGain(self: *const Self, lvl: f32) Gain {
-            const id = bindings.add_gain(self.parentId(), lvl);
+            const id = bindings.add_gain(self.nodeId(), lvl);
             return .{ .id = id };
         }
 
         /// Add a loop node that resets the input if it stops.
         pub fn addLoop(self: *const Self) Loop {
-            const id = bindings.add_loop(self.parentId());
+            const id = bindings.add_loop(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add a node that plays the inputs one after the other, in the order as they added.
         pub fn addConcat(self: *const Self) Concat {
-            const id = bindings.add_concat(self.parentId());
+            const id = bindings.add_concat(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add node panning the audio to the left (0.), right (1.), or something in between.
         pub fn addPan(self: *const Self, lvl: f32) Pan {
-            const id = bindings.add_pan(self.parentId(), lvl);
+            const id = bindings.add_pan(self.nodeId(), lvl);
             return .{ .id = id };
         }
 
         /// Add node that can be muted using modulation.
         pub fn addMute(self: *const Self) Mute {
-            const id = bindings.add_mute(self.parentId());
+            const id = bindings.add_mute(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add node that can be paused using modulation.
         pub fn addPause(self: *const Self) Pause {
-            const id = bindings.add_pause(self.parentId());
+            const id = bindings.add_pause(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add node tracking the elapsed playback time.
         pub fn addTrackPosition(self: *const Self) TrackPosition {
-            const id = bindings.add_track_position(self.parentId());
+            const id = bindings.add_track_position(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add lowpass filter node.
         pub fn addLowPass(self: *const Self, freq: f32, q: f32) LowPass {
-            const id = bindings.add_low_pass(self.parentId(), freq, q);
+            const id = bindings.add_low_pass(self.nodeId(), freq, q);
             return .{ .id = id };
         }
 
         /// Add highpass filter node.
         pub fn addHighPass(self: *const Self, freq: f32, q: f32) HighPass {
-            const id = bindings.add_high_pass(self.parentId(), freq, q);
+            const id = bindings.add_high_pass(self.nodeId(), freq, q);
             return .{ .id = id };
         }
 
         /// Add node converting stereo to mono by taking the left channel.
         pub fn addTakeLeft(self: *const Self) TakeLeft {
-            const id = bindings.add_take_left(self.parentId());
+            const id = bindings.add_take_left(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add node converting stereo to mono by taking the right channel.
         pub fn addTakeRight(self: *const Self) TakeRight {
-            const id = bindings.add_take_right(self.parentId());
+            const id = bindings.add_take_right(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add node swapping left and right channels of the stereo input.
         pub fn addSwap(self: *const Self) Swap {
-            const id = bindings.add_swap(self.parentId());
+            const id = bindings.add_swap(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add node clamping the input amplitude. Can be used for hard distortion.
         pub fn addClip(self: *const Self, low: f32, high: f32) Clip {
-            const id = bindings.add_clip(self.parentId(), low, high);
+            const id = bindings.add_clip(self.nodeId(), low, high);
             return .{ .id = id };
         }
 
         /// Reset the node state to how it was when it was just added.
         pub fn reset(self: *const Self) void {
-            bindings.reset(self.parentId());
+            bindings.reset(self.nodeId());
         }
 
         /// Reset the node and all child nodes to the state to how it was when they were just added.
         pub fn reset_all(self: *const Self) void {
-            bindings.reset_all(self.parentId());
+            bindings.reset_all(self.nodeId());
         }
 
         /// Remove all child nodes.
@@ -351,7 +351,7 @@ fn NodeMixin(comptime T: type) type {
         /// After it is called, you should make sure to discard all references to the old
         /// child nodes.
         pub fn clear(self: *const Self) void {
-            bindings.clear(self.parentId());
+            bindings.clear(self.nodeId());
         }
     };
 }
