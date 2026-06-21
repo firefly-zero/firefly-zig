@@ -5,6 +5,7 @@ const bindings = @import("./bindings.zig").audio;
 comptime {
     compile(@This());
 
+    compile(Freq);
     compile(Time);
     compile(LinearModulator);
     compile(HoldModulator);
@@ -200,8 +201,8 @@ pub const Freq = struct {
             10 => 14.57,
             else => 15.43,
         };
-        const oct = note / 12;
-        f *= @floatFromInt(1 << oct);
+        const oct: u4 = @intCast(note / 12);
+        f *= @floatFromInt(@as(u16, 1) << oct);
         return .{ .h = f };
     }
 };
