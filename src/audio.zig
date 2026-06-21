@@ -5,10 +5,25 @@ const bindings = @import("./bindings.zig").audio;
 comptime {
     compile(@This());
 
-    compile(Node);
+    compile(Time);
     compile(LinearModulator);
     compile(HoldModulator);
+    compile(AdsrModulator);
     compile(SineModulator);
+    compile(SquareModulator);
+    compile(SawtoothModulator);
+    compile(Node);
+    compile(Sine);
+    compile(Gain);
+    compile(Pan);
+    compile(Mute);
+    compile(Pause);
+    compile(LowPass);
+    compile(HighPass);
+    compile(Clip);
+    compile(Square);
+    compile(Sawtooth);
+    compile(Triangle);
 }
 
 fn compile(T: type) void {
@@ -362,7 +377,7 @@ fn NodeMixin(comptime T: type) type {
         }
 
         /// Reset the node and all child nodes to the state to how it was when they were just added.
-        pub fn reset_all(self: *const Self) void {
+        pub fn resetAll(self: *const Self) void {
             bindings.reset_all(self.nodeId());
         }
 
@@ -405,6 +420,44 @@ pub const HoldModulator = struct {
     }
 };
 
+/// ADSR envelope.
+///
+/// It looks like this: `🭋🭍🬹🬿`
+///
+///  1. Until `attack`, the value goes from 0 to 1;
+///  2. Until `decay`, it goes from 1 to `sustain_level`;
+///  3. Until `sustain`, it holds `sustain_level`;
+///  4. Until `release`, it goes from `sustain_level` to 0;
+///  5. After `release`, it holds 0.
+///
+/// Most commonly used with [`Gain`].
+pub const AdsrModulator = struct {
+    /// When the value reaches 1.
+    attack: Time,
+    /// When the value reaches `sustain_level`.
+    decay: Time,
+    /// Until when the value holds `sustain_level`.
+    sustain: Time,
+    /// The value generated from `decay` until `sustain`.
+    sustain_level: f32,
+    /// When the value drops to 0.
+    release: Time,
+
+    fn modulate(self: AdsrModulator, node_id: u32, param: u32, low: f32, high: f32) void {
+        bindings.mod_adsr(
+            node_id,
+            param,
+            low,
+            high,
+            self.attack.s,
+            self.decay.s,
+            self.sustain.s,
+            self.sustain_level,
+            self.release.s,
+        );
+    }
+};
+
 /// Sine wave low-frequency oscillator.
 ///
 /// It looks like this: `∿`.
@@ -415,6 +468,28 @@ pub const SineModulator = struct {
 
     fn modulate(self: SineModulator, node_id: u32, param: u32, low: f32, high: f32) void {
         bindings.mod_sine(node_id, param, self.f.h, low, high);
+    }
+};
+
+/// Square wave low-frequency oscillator.
+///
+/// It looks like this: `🭿🭾🭿🭾🭿🭾🭿🭾`.
+pub const SquareModulator = struct {
+    period: Time,
+
+    fn modulate(self: SquareModulator, node_id: u32, param: u32, low: f32, high: f32) void {
+        bindings.mod_square(node_id, param, low, high, self.period.s);
+    }
+};
+
+/// Sawtooth wave low-frequency oscillator.
+///
+/// It looks like this: `╱│╱│╱│╱│`.
+pub const SawtoothModulator = struct {
+    period: Time,
+
+    fn modulate(self: SawtoothModulator, node_id: u32, param: u32, low: f32, high: f32) void {
+        bindings.mod_sawtooth(node_id, param, low, high, self.period.s);
     }
 };
 
