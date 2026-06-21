@@ -6,7 +6,6 @@ comptime {
     compile(@This());
 
     compile(Node);
-    compileUnion(Modulator);
     compile(LinearModulator);
     compile(HoldModulator);
     compile(SineModulator);
@@ -419,18 +418,6 @@ pub const SineModulator = struct {
     }
 };
 
-pub const Modulator = union(enum) {
-    linear: LinearModulator,
-    hold: HoldModulator,
-    sine: SineModulator,
-
-    fn modulate(self: Modulator, node_id: u32, param: u32, low: f32, high: f32) void {
-        switch (self) {
-            inline else => |case| case.modulate(node_id, param, low, high),
-        }
-    }
-};
-
 const Node = struct {
     id: u32,
     node: NodeMixin(@This()) = .{},
@@ -442,7 +429,7 @@ pub const Sine = struct {
     id: u32,
     node: NodeMixin(@This()) = .{},
     /// Modulate oscillation frequency.
-    pub fn modulate(self: Sine, low: Freq, high: Freq, mod: Modulator) void {
+    pub fn modulate(self: Sine, low: Freq, high: Freq, mod: anytype) void {
         mod.modulate(self.id, 0, low.h, high.h);
     }
 };
@@ -452,7 +439,7 @@ pub const Gain = struct {
     id: u32,
     node: NodeMixin(@This()) = .{},
     /// Modulate the gain level.
-    pub fn modulate(self: Gain, low: f32, high: f32, mod: Modulator) void {
+    pub fn modulate(self: Gain, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 0, low, high);
     }
 };
@@ -462,7 +449,7 @@ pub const Pan = struct {
     id: u32,
     node: NodeMixin(@This()) = .{},
     /// Modulate the pan value (from 0. to 1.: 0. is only left, 1. is only right).
-    pub fn modulate(self: Pan, low: f32, high: f32, mod: Modulator) void {
+    pub fn modulate(self: Pan, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 0, low, high);
     }
 };
@@ -472,7 +459,7 @@ pub const Mute = struct {
     /// Modulate the muted state.
     ///
     /// Below 0.5 is muted, above is unmuted.
-    pub fn modulate(self: Mute, low: f32, high: f32, mod: Modulator) void {
+    pub fn modulate(self: Mute, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 0, low, high);
     }
 };
@@ -482,7 +469,7 @@ pub const Pause = struct {
     /// Modulate the paused state.
     ///
     /// Below 0.5 is paused, above is playing.
-    pub fn modulate(self: Pause, low: f32, high: f32, mod: Modulator) void {
+    pub fn modulate(self: Pause, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 0, low, high);
     }
 };
@@ -491,7 +478,7 @@ pub const LowPass = struct {
     id: u32,
     node: NodeMixin(@This()) = .{},
     /// Modulate the cut-off frequency.
-    pub fn modulate_freq(self: LowPass, low: Freq, high: Freq, mod: Modulator) void {
+    pub fn modulate_freq(self: LowPass, low: Freq, high: Freq, mod: anytype) void {
         mod.modulate(self.id, 0, low.h, high.h);
     }
 };
@@ -499,7 +486,7 @@ pub const HighPass = struct {
     id: u32,
     node: NodeMixin(@This()) = .{},
     /// Modulate the cut-off frequency.
-    pub fn modulate_freq(self: HighPass, low: Freq, high: Freq, mod: Modulator) void {
+    pub fn modulate_freq(self: HighPass, low: Freq, high: Freq, mod: anytype) void {
         mod.modulate(self.id, 0, low.h, high.h);
     }
 };
@@ -512,15 +499,15 @@ pub const Clip = struct {
     /// Modulate the low cut amplitude and adjust the high amplitude to keep the gap.
     ///
     /// In other words, the difference between low and high cut points will stay the same.
-    pub fn modulate_both(self: Clip, low: f32, high: f32, mod: Modulator) void {
+    pub fn modulate_both(self: Clip, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 0, low, high);
     }
     /// Modulate the low cut amplitude.
-    pub fn modulate_low(self: Clip, low: f32, high: f32, mod: Modulator) void {
+    pub fn modulate_low(self: Clip, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 1, low, high);
     }
     /// Modulate the high cut amplitude.
-    pub fn modulate_high(self: Clip, low: f32, high: f32, mod: Modulator) void {
+    pub fn modulate_high(self: Clip, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 2, low, high);
     }
 };
@@ -528,7 +515,7 @@ pub const Square = struct {
     id: u32,
     node: NodeMixin(@This()) = .{},
     /// Modulate oscillation frequency.
-    pub fn modulate(self: Square, low: Freq, high: Freq, mod: Modulator) void {
+    pub fn modulate(self: Square, low: Freq, high: Freq, mod: anytype) void {
         mod.modulate(self.id, 0, low.h, high.h);
     }
 };
@@ -536,7 +523,7 @@ pub const Sawtooth = struct {
     id: u32,
     node: NodeMixin(@This()) = .{},
     /// Modulate oscillation frequency.
-    pub fn modulate(self: Sawtooth, low: Freq, high: Freq, mod: Modulator) void {
+    pub fn modulate(self: Sawtooth, low: Freq, high: Freq, mod: anytype) void {
         mod.modulate(self.id, 0, low.h, high.h);
     }
 };
@@ -544,7 +531,7 @@ pub const Triangle = struct {
     id: u32,
     node: NodeMixin(@This()) = .{},
     /// Modulate oscillation frequency.
-    pub fn modulate(self: Triangle, low: Freq, high: Freq, mod: Modulator) void {
+    pub fn modulate(self: Triangle, low: Freq, high: Freq, mod: anytype) void {
         mod.modulate(self.id, 0, low.h, high.h);
     }
 };

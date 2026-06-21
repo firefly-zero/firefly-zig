@@ -7,5 +7,5 @@ pub export fn boot() void {
         .start_at = .zero,
         .end_at = .seconds(2),
     };
-    gain.modulate(0, 1, .{ .linear = mod });
+    gain.modulate(0, 1, mod);
 }
