@@ -34,13 +34,6 @@ fn compile(T: type) void {
     }
 }
 
-fn compileUnion(T: type) void {
-    const decls = @typeInfo(T).@"union".decls;
-    for (decls) |decl| {
-        _ = &@field(T, decl.name);
-    }
-}
-
 pub const sample_rate: u32 = 44_100;
 
 pub const Freq = struct {
