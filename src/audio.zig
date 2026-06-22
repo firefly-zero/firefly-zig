@@ -218,169 +218,151 @@ pub const Time = struct {
     }
 };
 
-fn NodeMixin(comptime T: type) type {
+fn Adder(comptime T: type) type {
     return struct {
         const Self = @This();
 
         fn nodeId(self: *const Self) u32 {
-            const parent: *const T = @alignCast(@fieldParentPtr("node", self));
+            const parent: *const T = @alignCast(@fieldParentPtr("add", self));
             return parent.id;
         }
 
         /// Add sine wave oscillator source (`∿`).
-        pub fn addSine(self: *const Self, f: Freq, phase: f32) Sine {
+        pub fn sine(self: *const Self, f: Freq, phase: f32) Sine {
             const id = bindings.add_sine(self.nodeId(), f.h, phase);
             return .{ .id = id };
         }
 
         /// Add square wave oscillator source (`⎍`).
-        pub fn addSquare(self: *const Self, f: Freq, phase: f32) Square {
+        pub fn square(self: *const Self, f: Freq, phase: f32) Square {
             const id = bindings.add_square(self.nodeId(), f.h, phase);
             return .{ .id = id };
         }
 
         /// Add sawtooth wave oscillator source (`╱│`).
-        pub fn addSawtooth(self: *const Self, f: Freq, phase: f32) Sawtooth {
+        pub fn sawtooth(self: *const Self, f: Freq, phase: f32) Sawtooth {
             const id = bindings.add_sawtooth(self.nodeId(), f.h, phase);
             return .{ .id = id };
         }
 
         /// Add triangle wave oscillator source (`╱╲`).
-        pub fn addTriangle(self: *const Self, f: Freq, phase: f32) Triangle {
+        pub fn triangle(self: *const Self, f: Freq, phase: f32) Triangle {
             const id = bindings.add_triangle(self.nodeId(), f.h, phase);
             return .{ .id = id };
         }
 
         /// Add white noise source (amplitude on each tick is random).
-        pub fn addNoise(self: *const Self, seed: i32) Noise {
+        pub fn noise(self: *const Self, seed: i32) Noise {
             const id = bindings.add_noise(self.nodeId(), seed);
             return .{ .id = id };
         }
 
         /// Add always stopped source.
-        pub fn addEmpty(self: *const Self) Empty {
+        pub fn empty(self: *const Self) Empty {
             const id = bindings.add_empty(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add silent source producing zeros.
-        pub fn addZero(self: *const Self) Zero {
+        pub fn zero(self: *const Self) Zero {
             const id = bindings.add_zero(self.nodeId());
             return .{ .id = id };
         }
 
         /// Play an audio file from ROM.
-        pub fn addFile(self: *const Self, path: []const u8) File {
+        pub fn file(self: *const Self, path: []const u8) File {
             const id = bindings.add_file(self.nodeId(), @intFromPtr(path.ptr), path.len);
             return .{ .id = id };
         }
 
         /// Add node simply mixing all inputs.
-        pub fn addMix(self: *const Self) Mix {
+        pub fn mix(self: *const Self) Mix {
             const id = bindings.add_mix(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add mixer node that stops if any of the sources stops.
-        pub fn addAllForOne(self: *const Self) AllForOne {
+        pub fn allForOne(self: *const Self) AllForOne {
             const id = bindings.add_all_for_one(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add gain control node.
-        pub fn addGain(self: *const Self, lvl: f32) Gain {
+        pub fn gain(self: *const Self, lvl: f32) Gain {
             const id = bindings.add_gain(self.nodeId(), lvl);
             return .{ .id = id };
         }
 
         /// Add a loop node that resets the input if it stops.
-        pub fn addLoop(self: *const Self) Loop {
+        pub fn loop(self: *const Self) Loop {
             const id = bindings.add_loop(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add a node that plays the inputs one after the other, in the order as they added.
-        pub fn addConcat(self: *const Self) Concat {
+        pub fn concat(self: *const Self) Concat {
             const id = bindings.add_concat(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add node panning the audio to the left (0.), right (1.), or something in between.
-        pub fn addPan(self: *const Self, lvl: f32) Pan {
+        pub fn pan(self: *const Self, lvl: f32) Pan {
             const id = bindings.add_pan(self.nodeId(), lvl);
             return .{ .id = id };
         }
 
         /// Add node that can be muted using modulation.
-        pub fn addMute(self: *const Self) Mute {
+        pub fn mute(self: *const Self) Mute {
             const id = bindings.add_mute(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add node that can be paused using modulation.
-        pub fn addPause(self: *const Self) Pause {
+        pub fn pause(self: *const Self) Pause {
             const id = bindings.add_pause(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add node tracking the elapsed playback time.
-        pub fn addTrackPosition(self: *const Self) TrackPosition {
+        pub fn trackPosition(self: *const Self) TrackPosition {
             const id = bindings.add_track_position(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add lowpass filter node.
-        pub fn addLowPass(self: *const Self, freq: Freq, q: f32) LowPass {
+        pub fn lowPass(self: *const Self, freq: Freq, q: f32) LowPass {
             const id = bindings.add_low_pass(self.nodeId(), freq.h, q);
             return .{ .id = id };
         }
 
         /// Add highpass filter node.
-        pub fn addHighPass(self: *const Self, freq: Freq, q: f32) HighPass {
+        pub fn highPass(self: *const Self, freq: Freq, q: f32) HighPass {
             const id = bindings.add_high_pass(self.nodeId(), freq.h, q);
             return .{ .id = id };
         }
 
         /// Add node converting stereo to mono by taking the left channel.
-        pub fn addTakeLeft(self: *const Self) TakeLeft {
+        pub fn takeLeft(self: *const Self) TakeLeft {
             const id = bindings.add_take_left(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add node converting stereo to mono by taking the right channel.
-        pub fn addTakeRight(self: *const Self) TakeRight {
+        pub fn takeRight(self: *const Self) TakeRight {
             const id = bindings.add_take_right(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add node swapping left and right channels of the stereo input.
-        pub fn addSwap(self: *const Self) Swap {
+        pub fn swap(self: *const Self) Swap {
             const id = bindings.add_swap(self.nodeId());
             return .{ .id = id };
         }
 
         /// Add node clamping the input amplitude. Can be used for hard distortion.
-        pub fn addClip(self: *const Self, low: f32, high: f32) Clip {
+        pub fn clip(self: *const Self, low: f32, high: f32) Clip {
             const id = bindings.add_clip(self.nodeId(), low, high);
             return .{ .id = id };
-        }
-
-        /// Reset the node state to how it was when it was just added.
-        pub fn reset(self: *const Self) void {
-            bindings.reset(self.nodeId());
-        }
-
-        /// Reset the node and all child nodes to the state to how it was when they were just added.
-        pub fn resetAll(self: *const Self) void {
-            bindings.reset_all(self.nodeId());
-        }
-
-        /// Remove all child nodes.
-        ///
-        /// After it is called, you should make sure to discard all references to the old
-        /// child nodes.
-        pub fn clear(self: *const Self) void {
-            bindings.clear(self.nodeId());
         }
     };
 }
@@ -489,82 +471,219 @@ pub const SawtoothModulator = struct {
 
 const Node = struct {
     id: u32,
-    node: NodeMixin(@This()) = .{},
-};
+    add: Adder(@This()) = .{},
 
-pub const BaseNode = Node;
+    /// Reset the node state to how it was when it was just added.
+    pub fn reset(self: *const @This()) void {
+        bindings.reset(self.id);
+    }
 
-pub const Sine = struct {
-    id: u32,
-    node: NodeMixin(@This()) = .{},
-    /// Modulate oscillation frequency.
-    pub fn modulate(self: Sine, low: Freq, high: Freq, mod: anytype) void {
-        mod.modulate(self.id, 0, low.h, high.h);
+    /// Reset the node and all child nodes to the state to how it was when they were just added.
+    pub fn resetAll(self: *const @This()) void {
+        bindings.reset_all(self.id);
+    }
+
+    /// Remove all child nodes.
+    ///
+    /// After it is called, you should make sure to discard all references to the old
+    /// child nodes.
+    pub fn clear(self: *const @This()) void {
+        bindings.clear(self.id);
     }
 };
+
 pub const Mix = Node;
+
 pub const AllForOne = Node;
+
 pub const Gain = struct {
     id: u32,
-    node: NodeMixin(@This()) = .{},
+    add: Adder(@This()) = .{},
+
     /// Modulate the gain level.
     pub fn modulate(self: Gain, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 0, low, high);
     }
+
+    /// Reset the node state to how it was when it was just added.
+    pub fn reset(self: *const @This()) void {
+        bindings.reset(self.id);
+    }
+
+    /// Reset the node and all child nodes to the state to how it was when they were just added.
+    pub fn resetAll(self: *const @This()) void {
+        bindings.reset_all(self.id);
+    }
+
+    /// Remove all child nodes.
+    ///
+    /// After it is called, you should make sure to discard all references to the old
+    /// child nodes.
+    pub fn clear(self: *const @This()) void {
+        bindings.clear(self.id);
+    }
 };
+
 pub const Loop = Node;
+
 pub const Concat = Node;
+
 pub const Pan = struct {
     id: u32,
-    node: NodeMixin(@This()) = .{},
+    add: Adder(@This()) = .{},
+
     /// Modulate the pan value (from 0. to 1.: 0. is only left, 1. is only right).
     pub fn modulate(self: Pan, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 0, low, high);
     }
+
+    /// Reset the node state to how it was when it was just added.
+    pub fn reset(self: *const @This()) void {
+        bindings.reset(self.id);
+    }
+
+    /// Reset the node and all child nodes to the state to how it was when they were just added.
+    pub fn resetAll(self: *const @This()) void {
+        bindings.reset_all(self.id);
+    }
+
+    /// Remove all child nodes.
+    ///
+    /// After it is called, you should make sure to discard all references to the old
+    /// child nodes.
+    pub fn clear(self: *const @This()) void {
+        bindings.clear(self.id);
+    }
 };
+
 pub const Mute = struct {
     id: u32,
-    node: NodeMixin(@This()) = .{},
+    add: Adder(@This()) = .{},
+
     /// Modulate the muted state.
     ///
     /// Below 0.5 is muted, above is unmuted.
     pub fn modulate(self: Mute, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 0, low, high);
     }
+
+    /// Reset the node state to how it was when it was just added.
+    pub fn reset(self: *const @This()) void {
+        bindings.reset(self.id);
+    }
+
+    /// Reset the node and all child nodes to the state to how it was when they were just added.
+    pub fn resetAll(self: *const @This()) void {
+        bindings.reset_all(self.id);
+    }
+
+    /// Remove all child nodes.
+    ///
+    /// After it is called, you should make sure to discard all references to the old
+    /// child nodes.
+    pub fn clear(self: *const @This()) void {
+        bindings.clear(self.id);
+    }
 };
+
 pub const Pause = struct {
     id: u32,
-    node: NodeMixin(@This()) = .{},
+    add: Adder(@This()) = .{},
+
     /// Modulate the paused state.
     ///
     /// Below 0.5 is paused, above is playing.
     pub fn modulate(self: Pause, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 0, low, high);
     }
+
+    /// Reset the node state to how it was when it was just added.
+    pub fn reset(self: *const @This()) void {
+        bindings.reset(self.id);
+    }
+
+    /// Reset the node and all child nodes to the state to how it was when they were just added.
+    pub fn resetAll(self: *const @This()) void {
+        bindings.reset_all(self.id);
+    }
+
+    /// Remove all child nodes.
+    ///
+    /// After it is called, you should make sure to discard all references to the old
+    /// child nodes.
+    pub fn clear(self: *const @This()) void {
+        bindings.clear(self.id);
+    }
 };
+
 pub const TrackPosition = Node;
+
 pub const LowPass = struct {
     id: u32,
-    node: NodeMixin(@This()) = .{},
+    add: Adder(@This()) = .{},
+
     /// Modulate the cut-off frequency.
     pub fn modulate_freq(self: LowPass, low: Freq, high: Freq, mod: anytype) void {
         mod.modulate(self.id, 0, low.h, high.h);
     }
+
+    /// Reset the node state to how it was when it was just added.
+    pub fn reset(self: *const @This()) void {
+        bindings.reset(self.id);
+    }
+
+    /// Reset the node and all child nodes to the state to how it was when they were just added.
+    pub fn resetAll(self: *const @This()) void {
+        bindings.reset_all(self.id);
+    }
+
+    /// Remove all child nodes.
+    ///
+    /// After it is called, you should make sure to discard all references to the old
+    /// child nodes.
+    pub fn clear(self: *const @This()) void {
+        bindings.clear(self.id);
+    }
 };
+
 pub const HighPass = struct {
     id: u32,
-    node: NodeMixin(@This()) = .{},
+    add: Adder(@This()) = .{},
+
     /// Modulate the cut-off frequency.
     pub fn modulate_freq(self: HighPass, low: Freq, high: Freq, mod: anytype) void {
         mod.modulate(self.id, 0, low.h, high.h);
     }
+
+    /// Reset the node state to how it was when it was just added.
+    pub fn reset(self: *const @This()) void {
+        bindings.reset(self.id);
+    }
+
+    /// Reset the node and all child nodes to the state to how it was when they were just added.
+    pub fn resetAll(self: *const @This()) void {
+        bindings.reset_all(self.id);
+    }
+
+    /// Remove all child nodes.
+    ///
+    /// After it is called, you should make sure to discard all references to the old
+    /// child nodes.
+    pub fn clear(self: *const @This()) void {
+        bindings.clear(self.id);
+    }
 };
+
 pub const TakeLeft = Node;
+
 pub const TakeRight = Node;
+
 pub const Swap = Node;
+
 pub const Clip = struct {
     id: u32,
-    node: NodeMixin(@This()) = .{},
+    add: Adder(@This()) = .{},
+
     /// Modulate the low cut amplitude and adjust the high amplitude to keep the gap.
     ///
     /// In other words, the difference between low and high cut points will stay the same.
@@ -579,34 +698,100 @@ pub const Clip = struct {
     pub fn modulate_high(self: Clip, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 2, low, high);
     }
+
+    /// Reset the node state to how it was when it was just added.
+    pub fn reset(self: *const @This()) void {
+        bindings.reset(self.id);
+    }
+
+    /// Reset the node and all child nodes to the state to how it was when they were just added.
+    pub fn resetAll(self: *const @This()) void {
+        bindings.reset_all(self.id);
+    }
+
+    /// Remove all child nodes.
+    ///
+    /// After it is called, you should make sure to discard all references to the old
+    /// child nodes.
+    pub fn clear(self: *const @This()) void {
+        bindings.clear(self.id);
+    }
 };
+
+pub const Sine = struct {
+    id: u32,
+
+    /// Modulate oscillation frequency.
+    pub fn modulate(self: Sine, low: Freq, high: Freq, mod: anytype) void {
+        mod.modulate(self.id, 0, low.h, high.h);
+    }
+
+    /// Reset the node state to how it was when it was just added.
+    pub fn reset(self: *const @This()) void {
+        bindings.reset(self.id);
+    }
+};
+
 pub const Square = struct {
     id: u32,
-    node: NodeMixin(@This()) = .{},
+
     /// Modulate oscillation frequency.
     pub fn modulate(self: Square, low: Freq, high: Freq, mod: anytype) void {
         mod.modulate(self.id, 0, low.h, high.h);
     }
+
+    /// Reset the node state to how it was when it was just added.
+    pub fn reset(self: *const @This()) void {
+        bindings.reset(self.id);
+    }
 };
+
 pub const Sawtooth = struct {
     id: u32,
-    node: NodeMixin(@This()) = .{},
+
     /// Modulate oscillation frequency.
     pub fn modulate(self: Sawtooth, low: Freq, high: Freq, mod: anytype) void {
         mod.modulate(self.id, 0, low.h, high.h);
     }
+
+    /// Reset the node state to how it was when it was just added.
+    pub fn reset(self: *const @This()) void {
+        bindings.reset(self.id);
+    }
 };
+
 pub const Triangle = struct {
     id: u32,
-    node: NodeMixin(@This()) = .{},
+
     /// Modulate oscillation frequency.
     pub fn modulate(self: Triangle, low: Freq, high: Freq, mod: anytype) void {
         mod.modulate(self.id, 0, low.h, high.h);
     }
-};
-pub const Noise = Node;
-pub const Empty = Node;
-pub const Zero = Node;
-pub const File = Node;
 
-pub const out: BaseNode = .{ .id = 0 };
+    /// Reset the node state to how it was when it was just added.
+    pub fn reset(self: *const @This()) void {
+        bindings.reset(self.id);
+    }
+};
+
+const SourceNode = struct {
+    id: u32,
+
+    /// Reset the node state to how it was when it was just added.
+    pub fn reset(self: *const @This()) void {
+        bindings.reset(self.id);
+    }
+};
+
+pub const Noise = SourceNode;
+
+pub const Empty = SourceNode;
+
+pub const Zero = SourceNode;
+
+pub const File = SourceNode;
+
+const Out = Node;
+
+/// The output audio node. Mixes all inputs and plays them on the device's speaker.
+pub const out: Out = .{ .id = 0 };
