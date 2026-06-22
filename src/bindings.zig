@@ -198,6 +198,7 @@ pub const audio = struct {
     pub extern "audio" fn reset(node_id: u32) void;
     pub extern "audio" fn reset_all(node_id: u32) void;
     pub extern "audio" fn clear(node_id: u32) void;
+    pub extern "audio" fn set_param(node_id: u32, param: u32, val: f32) void;
 
     pub extern "audio" fn mod_linear(node_id: u32, param: u32, low: f32, high: f32, start_at: u32, end_at: u32) void;
     pub extern "audio" fn mod_hold(node_id: u32, param: u32, low: f32, high: f32, time: u32) void;
