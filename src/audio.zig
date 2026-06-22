@@ -505,13 +505,18 @@ pub const Gain = struct {
         mod.modulate(self.id, 0, low, high);
     }
 
+    /// Set the gain level.
+    pub fn set(self: Gain, val: f32) void {
+        bindings.set_param(self.id, 0, val);
+    }
+
     /// Reset the node state to how it was when it was just added.
-    pub fn reset(self: *const @This()) void {
+    pub fn reset(self: *const Gain) void {
         bindings.reset(self.id);
     }
 
     /// Reset the node and all child nodes to the state to how it was when they were just added.
-    pub fn resetAll(self: *const @This()) void {
+    pub fn resetAll(self: *const Gain) void {
         bindings.reset_all(self.id);
     }
 
@@ -519,7 +524,7 @@ pub const Gain = struct {
     ///
     /// After it is called, you should make sure to discard all references to the old
     /// child nodes.
-    pub fn clear(self: *const @This()) void {
+    pub fn clear(self: *const Gain) void {
         bindings.clear(self.id);
     }
 };
@@ -535,6 +540,11 @@ pub const Pan = struct {
     /// Modulate the pan value (from 0. to 1.: 0. is only left, 1. is only right).
     pub fn modulate(self: Pan, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 0, low, high);
+    }
+
+    /// Set the pan value (from 0. to 1.: 0. is only left, 1. is only right).
+    pub fn set(self: Pan, val: f32) void {
+        bindings.set_param(self.id, 0, val);
     }
 
     /// Reset the node state to how it was when it was just added.
@@ -567,13 +577,21 @@ pub const Mute = struct {
         mod.modulate(self.id, 0, low, high);
     }
 
+    pub fn mute(self: Mute) void {
+        bindings.set_param(self.id, 0, 0);
+    }
+
+    pub fn unmute(self: Mute) void {
+        bindings.set_param(self.id, 0, 1);
+    }
+
     /// Reset the node state to how it was when it was just added.
-    pub fn reset(self: *const @This()) void {
+    pub fn reset(self: *const Mute) void {
         bindings.reset(self.id);
     }
 
     /// Reset the node and all child nodes to the state to how it was when they were just added.
-    pub fn resetAll(self: *const @This()) void {
+    pub fn resetAll(self: *const Mute) void {
         bindings.reset_all(self.id);
     }
 
@@ -581,7 +599,7 @@ pub const Mute = struct {
     ///
     /// After it is called, you should make sure to discard all references to the old
     /// child nodes.
-    pub fn clear(self: *const @This()) void {
+    pub fn clear(self: *const Mute) void {
         bindings.clear(self.id);
     }
 };
@@ -595,6 +613,14 @@ pub const Pause = struct {
     /// Below 0.5 is paused, above is playing.
     pub fn modulate(self: Pause, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 0, low, high);
+    }
+
+    pub fn pause(self: Pause) void {
+        bindings.set_param(self.id, 0, 0);
+    }
+
+    pub fn play(self: Pause) void {
+        bindings.set_param(self.id, 0, 1);
     }
 
     /// Reset the node state to how it was when it was just added.
@@ -627,6 +653,11 @@ pub const LowPass = struct {
         mod.modulate(self.id, 0, low.h, high.h);
     }
 
+    /// Set the cut-off frequency.
+    pub fn set_freq(self: LowPass, val: Freq) void {
+        bindings.set_param(self.id, 0, val.h);
+    }
+
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
         bindings.reset(self.id);
@@ -653,6 +684,11 @@ pub const HighPass = struct {
     /// Modulate the cut-off frequency.
     pub fn modulate_freq(self: HighPass, low: Freq, high: Freq, mod: anytype) void {
         mod.modulate(self.id, 0, low.h, high.h);
+    }
+
+    /// Set the cut-off frequency.
+    pub fn set_freq(self: HighPass, val: Freq) void {
+        bindings.set_param(self.id, 0, val.h);
     }
 
     /// Reset the node state to how it was when it was just added.
@@ -690,13 +726,28 @@ pub const Clip = struct {
     pub fn modulate_both(self: Clip, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 0, low, high);
     }
+
+    /// Set the low cut amplitude and adjust the high amplitude to keep the gap.
+    pub fn set_both(self: Clip, val: f32) void {
+        bindings.set_param(self.id, 0, val);
+    }
     /// Modulate the low cut amplitude.
     pub fn modulate_low(self: Clip, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 1, low, high);
     }
+
+    /// Set the low cut amplitude.
+    pub fn set_low(self: Clip, val: f32) void {
+        bindings.set_param(self.id, 1, val);
+    }
     /// Modulate the high cut amplitude.
     pub fn modulate_high(self: Clip, low: f32, high: f32, mod: anytype) void {
         mod.modulate(self.id, 2, low, high);
+    }
+
+    /// Set the high cut amplitude.
+    pub fn set_high(self: Clip, val: f32) void {
+        bindings.set_param(self.id, 2, val);
     }
 
     /// Reset the node state to how it was when it was just added.
@@ -726,6 +777,11 @@ pub const Sine = struct {
         mod.modulate(self.id, 0, low.h, high.h);
     }
 
+    /// Set oscillation frequency.
+    pub fn set(self: Sine, val: Freq) void {
+        bindings.set_param(self.id, 0, val.h);
+    }
+
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
         bindings.reset(self.id);
@@ -738,6 +794,11 @@ pub const Square = struct {
     /// Modulate oscillation frequency.
     pub fn modulate(self: Square, low: Freq, high: Freq, mod: anytype) void {
         mod.modulate(self.id, 0, low.h, high.h);
+    }
+
+    /// Set oscillation frequency.
+    pub fn set(self: Square, val: Freq) void {
+        bindings.set_param(self.id, 0, val.h);
     }
 
     /// Reset the node state to how it was when it was just added.
@@ -754,6 +815,11 @@ pub const Sawtooth = struct {
         mod.modulate(self.id, 0, low.h, high.h);
     }
 
+    /// Set oscillation frequency.
+    pub fn set(self: Sawtooth, val: Freq) void {
+        bindings.set_param(self.id, 0, val.h);
+    }
+
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
         bindings.reset(self.id);
@@ -766,6 +832,11 @@ pub const Triangle = struct {
     /// Modulate oscillation frequency.
     pub fn modulate(self: Triangle, low: Freq, high: Freq, mod: anytype) void {
         mod.modulate(self.id, 0, low.h, high.h);
+    }
+
+    /// Set oscillation frequency.
+    pub fn set(self: Triangle, val: Freq) void {
+        bindings.set_param(self.id, 0, val.h);
     }
 
     /// Reset the node state to how it was when it was just added.
