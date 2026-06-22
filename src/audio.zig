@@ -475,12 +475,12 @@ const Node = struct {
 
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
-        bindings.reset(self.nodeId());
+        bindings.reset(self.id);
     }
 
     /// Reset the node and all child nodes to the state to how it was when they were just added.
     pub fn resetAll(self: *const @This()) void {
-        bindings.reset_all(self.nodeId());
+        bindings.reset_all(self.id);
     }
 
     /// Remove all child nodes.
@@ -488,7 +488,7 @@ const Node = struct {
     /// After it is called, you should make sure to discard all references to the old
     /// child nodes.
     pub fn clear(self: *const @This()) void {
-        bindings.clear(self.nodeId());
+        bindings.clear(self.id);
     }
 };
 
@@ -507,12 +507,12 @@ pub const Gain = struct {
 
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
-        bindings.reset(self.nodeId());
+        bindings.reset(self.id);
     }
 
     /// Reset the node and all child nodes to the state to how it was when they were just added.
     pub fn resetAll(self: *const @This()) void {
-        bindings.reset_all(self.nodeId());
+        bindings.reset_all(self.id);
     }
 
     /// Remove all child nodes.
@@ -520,7 +520,7 @@ pub const Gain = struct {
     /// After it is called, you should make sure to discard all references to the old
     /// child nodes.
     pub fn clear(self: *const @This()) void {
-        bindings.clear(self.nodeId());
+        bindings.clear(self.id);
     }
 };
 
@@ -539,12 +539,12 @@ pub const Pan = struct {
 
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
-        bindings.reset(self.nodeId());
+        bindings.reset(self.id);
     }
 
     /// Reset the node and all child nodes to the state to how it was when they were just added.
     pub fn resetAll(self: *const @This()) void {
-        bindings.reset_all(self.nodeId());
+        bindings.reset_all(self.id);
     }
 
     /// Remove all child nodes.
@@ -552,7 +552,7 @@ pub const Pan = struct {
     /// After it is called, you should make sure to discard all references to the old
     /// child nodes.
     pub fn clear(self: *const @This()) void {
-        bindings.clear(self.nodeId());
+        bindings.clear(self.id);
     }
 };
 
@@ -569,12 +569,12 @@ pub const Mute = struct {
 
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
-        bindings.reset(self.nodeId());
+        bindings.reset(self.id);
     }
 
     /// Reset the node and all child nodes to the state to how it was when they were just added.
     pub fn resetAll(self: *const @This()) void {
-        bindings.reset_all(self.nodeId());
+        bindings.reset_all(self.id);
     }
 
     /// Remove all child nodes.
@@ -582,7 +582,7 @@ pub const Mute = struct {
     /// After it is called, you should make sure to discard all references to the old
     /// child nodes.
     pub fn clear(self: *const @This()) void {
-        bindings.clear(self.nodeId());
+        bindings.clear(self.id);
     }
 };
 
@@ -599,12 +599,12 @@ pub const Pause = struct {
 
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
-        bindings.reset(self.nodeId());
+        bindings.reset(self.id);
     }
 
     /// Reset the node and all child nodes to the state to how it was when they were just added.
     pub fn resetAll(self: *const @This()) void {
-        bindings.reset_all(self.nodeId());
+        bindings.reset_all(self.id);
     }
 
     /// Remove all child nodes.
@@ -612,7 +612,7 @@ pub const Pause = struct {
     /// After it is called, you should make sure to discard all references to the old
     /// child nodes.
     pub fn clear(self: *const @This()) void {
-        bindings.clear(self.nodeId());
+        bindings.clear(self.id);
     }
 };
 
@@ -629,12 +629,12 @@ pub const LowPass = struct {
 
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
-        bindings.reset(self.nodeId());
+        bindings.reset(self.id);
     }
 
     /// Reset the node and all child nodes to the state to how it was when they were just added.
     pub fn resetAll(self: *const @This()) void {
-        bindings.reset_all(self.nodeId());
+        bindings.reset_all(self.id);
     }
 
     /// Remove all child nodes.
@@ -642,7 +642,7 @@ pub const LowPass = struct {
     /// After it is called, you should make sure to discard all references to the old
     /// child nodes.
     pub fn clear(self: *const @This()) void {
-        bindings.clear(self.nodeId());
+        bindings.clear(self.id);
     }
 };
 
@@ -657,12 +657,12 @@ pub const HighPass = struct {
 
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
-        bindings.reset(self.nodeId());
+        bindings.reset(self.id);
     }
 
     /// Reset the node and all child nodes to the state to how it was when they were just added.
     pub fn resetAll(self: *const @This()) void {
-        bindings.reset_all(self.nodeId());
+        bindings.reset_all(self.id);
     }
 
     /// Remove all child nodes.
@@ -670,7 +670,7 @@ pub const HighPass = struct {
     /// After it is called, you should make sure to discard all references to the old
     /// child nodes.
     pub fn clear(self: *const @This()) void {
-        bindings.clear(self.nodeId());
+        bindings.clear(self.id);
     }
 };
 
@@ -701,12 +701,12 @@ pub const Clip = struct {
 
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
-        bindings.reset(self.nodeId());
+        bindings.reset(self.id);
     }
 
     /// Reset the node and all child nodes to the state to how it was when they were just added.
     pub fn resetAll(self: *const @This()) void {
-        bindings.reset_all(self.nodeId());
+        bindings.reset_all(self.id);
     }
 
     /// Remove all child nodes.
@@ -714,7 +714,7 @@ pub const Clip = struct {
     /// After it is called, you should make sure to discard all references to the old
     /// child nodes.
     pub fn clear(self: *const @This()) void {
-        bindings.clear(self.nodeId());
+        bindings.clear(self.id);
     }
 };
 
@@ -728,7 +728,7 @@ pub const Sine = struct {
 
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
-        bindings.reset(self.nodeId());
+        bindings.reset(self.id);
     }
 };
 
@@ -742,7 +742,7 @@ pub const Square = struct {
 
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
-        bindings.reset(self.nodeId());
+        bindings.reset(self.id);
     }
 };
 
@@ -756,7 +756,7 @@ pub const Sawtooth = struct {
 
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
-        bindings.reset(self.nodeId());
+        bindings.reset(self.id);
     }
 };
 
@@ -770,7 +770,7 @@ pub const Triangle = struct {
 
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
-        bindings.reset(self.nodeId());
+        bindings.reset(self.id);
     }
 };
 
@@ -779,7 +779,7 @@ const SourceNode = struct {
 
     /// Reset the node state to how it was when it was just added.
     pub fn reset(self: *const @This()) void {
-        bindings.reset(self.nodeId());
+        bindings.reset(self.id);
     }
 };
 
