@@ -7,14 +7,15 @@ comptime {
 
     compile(Freq);
     compile(Time);
+    compile(Node);
+
     compile(LinearModulator);
     compile(HoldModulator);
     compile(AdsrModulator);
     compile(SineModulator);
     compile(SquareModulator);
     compile(SawtoothModulator);
-    compile(Node);
-    compile(Sine);
+
     compile(Gain);
     compile(Pan);
     compile(Mute);
@@ -22,9 +23,12 @@ comptime {
     compile(LowPass);
     compile(HighPass);
     compile(Clip);
+
+    compile(Sine);
     compile(Square);
     compile(Sawtooth);
     compile(Triangle);
+    compile(File);
 }
 
 fn compile(T: type) void {
@@ -860,7 +864,19 @@ pub const Empty = SourceNode;
 
 pub const Zero = SourceNode;
 
-pub const File = SourceNode;
+pub const File = struct {
+    id: u32,
+
+    /// Go to the specified timestamp in the file.
+    pub fn seek(self: File, t: Time) void {
+        bindings.set_param(self.id, 0, @floatFromInt(t.s));
+    }
+
+    /// Reset the node state to how it was when it was just added.
+    pub fn reset(self: *const @This()) void {
+        bindings.reset(self.id);
+    }
+};
 
 const Out = Node;
 
