@@ -566,12 +566,12 @@ pub const Duration = struct {
 
     /// The duration as an integer millisecond count.
     pub fn milliseconds(self: Duration) i64 {
-        return self.microseconds() / 1000;
+        return @divTrunc(self.microseconds(), 1000);
     }
 
     /// The duration as an integer second count.
     pub fn seconds(self: Duration) i64 {
-        return self.milliseconds() / 1000;
+        return @divTrunc(self.milliseconds(), 1000);
     }
 };
 
