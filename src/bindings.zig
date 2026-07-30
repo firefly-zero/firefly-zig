@@ -148,6 +148,7 @@ pub extern "misc" fn log_debug(ptr: u32, len: u32) void;
 pub extern "misc" fn log_error(ptr: u32, len: u32) void;
 pub extern "misc" fn set_seed(seed: u32) void;
 pub extern "misc" fn get_random() u32;
+pub extern "misc" fn get_time() u64;
 pub extern "misc" fn get_settings(peer: u32) u64;
 pub extern "misc" fn quit() void;
 

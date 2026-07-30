@@ -10,6 +10,7 @@ comptime {
     compile(Buttons);
     compile(Canvas);
     compile(DPad8);
+    compile(Duration);
     compile(File);
     compile(Font);
     compile(Image);
@@ -528,6 +529,52 @@ pub const Settings = struct {
     easterEggs: bool,
 };
 
+pub const Duration = struct {
+    us: i64,
+
+    fn fromMicroseconds(us: i64) Duration {
+        return Duration{ .us = us };
+    }
+
+    fn fromMilliseconds(ms: i64) Duration {
+        return Duration{ .us = ms * 1000 };
+    }
+
+    fn fromSeconds(s: i64) Duration {
+        return Duration{ .us = s * 1_000_000 };
+    }
+
+    /// True if the left duration is less than the right one.
+    pub fn lt(self: Duration, rhs: Duration) bool {
+        return self.us < rhs.us;
+    }
+
+    /// True if the given durations are equal.
+    pub fn eq(self: Duration, rhs: Duration) bool {
+        return self.us == rhs.us;
+    }
+
+    /// Add two durations.
+    pub fn add(self: Duration, rhs: Duration) Duration {
+        return Duration{ .us = self.us + rhs.us };
+    }
+
+    /// The duration as an integer microsecond count.
+    pub fn microseconds(self: Duration) i64 {
+        return self.us;
+    }
+
+    /// The duration as an integer millisecond count.
+    pub fn milliseconds(self: Duration) i64 {
+        return @divTrunc(self.microseconds(), 1000);
+    }
+
+    /// The duration as an integer second count.
+    pub fn seconds(self: Duration) i64 {
+        return @divTrunc(self.milliseconds(), 1000);
+    }
+};
+
 pub const Badge = u8;
 pub const Board = u8;
 
@@ -871,6 +918,10 @@ pub fn setSeed(seed: u32) void {
 /// Get a random value.
 pub fn getRandom() u32 {
     return bindings.get_random();
+}
+
+pub fn getTime() Duration {
+    return Duration{ .us = @intCast(bindings.get_time()) };
 }
 
 /// Get system settings
