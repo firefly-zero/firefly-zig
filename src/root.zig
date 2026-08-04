@@ -532,15 +532,15 @@ pub const Settings = struct {
 pub const Duration = struct {
     us: i64,
 
-    fn fromMicroseconds(us: i64) Duration {
+    pub fn fromMicroseconds(us: i64) Duration {
         return Duration{ .us = us };
     }
 
-    fn fromMilliseconds(ms: i64) Duration {
+    pub fn fromMilliseconds(ms: i64) Duration {
         return Duration{ .us = ms * 1000 };
     }
 
-    fn fromSeconds(s: i64) Duration {
+    pub fn fromSeconds(s: i64) Duration {
         return Duration{ .us = s * 1_000_000 };
     }
 
