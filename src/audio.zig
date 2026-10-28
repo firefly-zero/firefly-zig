@@ -32,9 +32,9 @@ comptime {
 }
 
 fn compile(T: type) void {
-    const decls = @typeInfo(T).@"struct".decls;
-    for (decls) |decl| {
-        _ = &@field(T, decl.name);
+    const decl_names = comptime @typeInfo(T).@"struct".decl_names;
+    inline for (decl_names) |name| {
+        _ = &@field(T, name);
     }
 }
 

@@ -34,16 +34,16 @@ comptime {
 }
 
 fn compile(T: type) void {
-    const decls = @typeInfo(T).@"struct".decls;
-    for (decls) |decl| {
-        _ = &@field(T, decl.name);
+    const decl_names = comptime @typeInfo(T).@"struct".decl_names;
+    inline for (decl_names) |name| {
+        _ = &@field(T, name);
     }
 }
 
 fn compileEnum(T: type) void {
-    const decls = @typeInfo(T).@"enum".decls;
-    for (decls) |decl| {
-        _ = &@field(T, decl.name);
+    const decl_names = comptime @typeInfo(T).@"enum".decl_names;
+    inline for (decl_names) |name| {
+        _ = &@field(T, name);
     }
 }
 
@@ -591,22 +591,22 @@ pub const Progress = struct {
 
 /// Fill the whole frame with the given color.
 pub fn clearScreen(c: Color) void {
-    bindings.clear_screen(@intFromEnum(c));
+    bindings.clear_screen(@backingInt(c));
 }
 
 /// Set a color value in the palette.
 pub fn setColor(c: Color, v: RGB) void {
-    bindings.set_color(@intFromEnum(c), v.r, v.g, v.b);
+    bindings.set_color(@backingInt(c), v.r, v.g, v.b);
 }
 
 /// Set a single point (1 pixel is scaling is 1) on the frame.
 pub fn drawPoint(p: Point, c: Color) void {
-    bindings.draw_point(p.x, p.y, @intFromEnum(c));
+    bindings.draw_point(p.x, p.y, @backingInt(c));
 }
 
 /// Draw a straight line from point a to point b.
 pub fn drawLine(a: Point, b: Point, s: LineStyle) void {
-    bindings.draw_line(a.x, a.y, b.x, b.y, @intFromEnum(s.color), s.width);
+    bindings.draw_line(a.x, a.y, b.x, b.y, @backingInt(s.color), s.width);
 }
 
 /// Draw a rectangle filling the given bounding box.
@@ -616,8 +616,8 @@ pub fn drawRect(p: Point, b: Size, s: Style) void {
         p.y,
         b.width,
         b.height,
-        @intFromEnum(s.fill_color),
-        @intFromEnum(s.stroke_color),
+        @backingInt(s.fill_color),
+        @backingInt(s.stroke_color),
         s.stroke_width,
     );
 }
@@ -631,8 +631,8 @@ pub fn drawRoundedRect(p: Point, b: Size, corner: Size, s: Style) void {
         b.height,
         corner.width,
         corner.height,
-        @intFromEnum(s.fill_color),
-        @intFromEnum(s.stroke_color),
+        @backingInt(s.fill_color),
+        @backingInt(s.stroke_color),
         s.stroke_width,
     );
 }
@@ -643,8 +643,8 @@ pub fn drawCircle(p: Point, d: i32, s: Style) void {
         p.x,
         p.y,
         d,
-        @intFromEnum(s.fill_color),
-        @intFromEnum(s.stroke_color),
+        @backingInt(s.fill_color),
+        @backingInt(s.stroke_color),
         s.stroke_width,
     );
 }
@@ -656,8 +656,8 @@ pub fn drawEllipse(p: Point, b: Size, s: Style) void {
         p.y,
         b.width,
         b.height,
-        @intFromEnum(s.fill_color),
-        @intFromEnum(s.stroke_color),
+        @backingInt(s.fill_color),
+        @backingInt(s.stroke_color),
         s.stroke_width,
     );
 }
@@ -673,8 +673,8 @@ pub fn drawTriangle(a: Point, b: Point, c: Point, s: Style) void {
         b.y,
         c.x,
         c.y,
-        @intFromEnum(s.fill_color),
-        @intFromEnum(s.stroke_color),
+        @backingInt(s.fill_color),
+        @backingInt(s.stroke_color),
         s.stroke_width,
     );
 }
@@ -687,8 +687,8 @@ pub fn drawArc(p: Point, d: i32, start: Angle, sweep: Angle, s: Style) void {
         d,
         start.radians,
         sweep.radians,
-        @intFromEnum(s.fill_color),
-        @intFromEnum(s.stroke_color),
+        @backingInt(s.fill_color),
+        @backingInt(s.stroke_color),
         s.stroke_width,
     );
 }
@@ -701,8 +701,8 @@ pub fn drawSector(p: Point, d: i32, start: Angle, sweep: Angle, s: Style) void {
         d,
         start.radians,
         sweep.radians,
-        @intFromEnum(s.fill_color),
-        @intFromEnum(s.stroke_color),
+        @backingInt(s.fill_color),
+        @backingInt(s.stroke_color),
         s.stroke_width,
     );
 }
@@ -719,7 +719,7 @@ pub fn drawText(t: String, f: Font, p: Point, c: Color) void {
         f.raw.len,
         p.x,
         p.y,
-        @intFromEnum(c),
+        @backingInt(c),
     );
 }
 
@@ -730,8 +730,8 @@ pub fn drawQR(t: String, p: Point, black: Color, white: Color) void {
         t.len,
         p.x,
         p.y,
-        @intFromEnum(black),
-        @intFromEnum(white),
+        @backingInt(black),
+        @backingInt(white),
     );
 }
 
@@ -950,7 +950,7 @@ pub fn getSettings(p: Peer) Settings {
 
 fn parseColor(c: u64) Color {
     const v = c & 0xf + 1;
-    return @enumFromInt(v);
+    return @fromBackingInt(@intCast(v));
 }
 
 /// Exit the app after the current update is finished.
