@@ -5,7 +5,7 @@ pub fn build(b: *std.Build) !void {
         .cpu_arch = .wasm32,
         .os_tag = .freestanding,
     };
-    const optimize: std.builtin.OptimizeMode = .ReleaseSmall;
+    const optimize: std.builtin.OptimizeMode = .small;
     const dep_opts = .{ .target = target, .optimize = optimize };
     _ = dep_opts;
     _ = b.addModule("firefly", .{

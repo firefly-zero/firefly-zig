@@ -2,6 +2,7 @@
     .name = .firefly_zig,
     .version = "0.6.0",
     .fingerprint = 0x763965862626a06a,
+    .minimum_zig_version = "0.17.0",
     .dependencies = .{},
     .paths = .{
         "build.zig",

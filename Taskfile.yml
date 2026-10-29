@@ -5,7 +5,7 @@ tasks:
   release:
     desc: build and publish release
     cmds:
-      - test {{.CLI_ARGS}}
+      - task: test
       - grep -F '"{{.CLI_ARGS}}"' build.zig.zon
       - git tag {{.CLI_ARGS}}
       - git push
