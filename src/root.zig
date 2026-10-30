@@ -8,7 +8,6 @@ comptime {
 
     compile(Angle);
     compile(Buttons);
-    compile(Canvas);
     compile(DPad8);
     compile(Duration);
     compile(File);
@@ -183,14 +182,6 @@ pub const Image = struct {
             .size = s,
             .raw = self.raw,
         };
-    }
-};
-
-pub const Canvas = struct {
-    raw: []u8,
-
-    pub fn toImage(self: Canvas) Image {
-        return .{ .raw = self.raw };
     }
 };
 
@@ -798,12 +789,12 @@ pub fn drawNineSlice(i: SubImage, p: Point, s: Size) void {
     );
 }
 
-/// Set canvas to be used for all subsequent drawing operations.
-pub fn setCanvas(c: Canvas) void {
+/// Set the target image for all subsequent drawing operations.
+pub fn setCanvas(c: Image) void {
     bindings.set_canvas(@intFromPtr(c.raw.ptr), c.raw.len);
 }
 
-/// Unset canvas set by [`set_canvas`]. All subsequent drawing operations will target frame buffer.
+/// Unset canvas set by `setCanvas`. All subsequent drawing operations will target the screen.
 pub fn unsetCanvas() void {
     bindings.unset_canvas();
 }
