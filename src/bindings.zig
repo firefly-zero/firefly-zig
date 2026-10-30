@@ -1,4 +1,6 @@
 pub extern "graphics" fn clear_screen(color: i32) void;
+pub extern "graphics" fn flip_x() void;
+pub extern "graphics" fn flip_y() void;
 pub extern "graphics" fn set_color(index: i32, r: i32, g: i32, b: i32) void;
 pub extern "graphics" fn draw_point(x: i32, y: i32, color: i32) void;
 pub extern "graphics" fn draw_line(

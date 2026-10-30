@@ -585,6 +585,20 @@ pub fn clearScreen(c: Color) void {
     bindings.clear_screen(@backingInt(c));
 }
 
+/// Horizontally flip the image currently rendered on the screen.
+///
+/// Most commonly used together with [`setCanvas`] to flip images (sprites).
+pub fn flipX() void {
+    bindings.flip_x();
+}
+
+/// Vertically flip the image currently rendered on the screen.
+///
+/// Most commonly used together with [`setCanvas`] to flip images (sprites).
+pub fn flipY() void {
+    bindings.flip_y();
+}
+
 /// Set a color value in the palette.
 pub fn setColor(c: Color, v: RGB) void {
     bindings.set_color(@backingInt(c), v.r, v.g, v.b);
@@ -794,7 +808,7 @@ pub fn setCanvas(c: Image) void {
     bindings.set_canvas(@intFromPtr(c.raw.ptr), c.raw.len);
 }
 
-/// Unset canvas set by `setCanvas`. All subsequent drawing operations will target the screen.
+/// Unset canvas set by [`setCanvas`]. All subsequent drawing operations will target the screen.
 pub fn unsetCanvas() void {
     bindings.unset_canvas();
 }
