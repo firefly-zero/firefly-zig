@@ -206,7 +206,7 @@ pub const audio = struct {
     pub extern "audio" fn mod_linear(node_id: u32, param: u32, low: f32, high: f32, start_at: u32, end_at: u32) void;
     pub extern "audio" fn mod_hold(node_id: u32, param: u32, low: f32, high: f32, time: u32) void;
     pub extern "audio" fn mod_sine(node_id: u32, param: u32, freq: f32, low: f32, high: f32) void;
-    pub extern "audio" fn mod_square(id: u32, param: u32, low: f32, high: f32, period: u32) void;
-    pub extern "audio" fn mod_sawtooth(id: u32, param: u32, low: f32, high: f32, period: u32) void;
-    pub extern "audio" fn mod_adsr(id: u32, param: u32, low: f32, high: f32, attack: u32, decay: u32, sustain: u32, sustain_level: f32, release: u32) void;
+    pub extern "audio" fn mod_square(node_id: u32, param: u32, low: f32, high: f32, period: u32) void;
+    pub extern "audio" fn mod_sawtooth(node_id: u32, param: u32, low: f32, high: f32, period: u32) void;
+    pub extern "audio" fn mod_adsr(node_id: u32, param: u32, low: f32, high: f32, attack: u32, decay: u32, sustain: u32, sustain_level: f32, release: u32) void;
 };
